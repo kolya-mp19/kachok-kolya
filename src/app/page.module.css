@@ -1,0 +1,165 @@
+.page {
+  min-height: 100vh;
+  background: linear-gradient(160deg, #f2f6ff 0%, #eefaf4 100%);
+  padding: 32px 16px;
+}
+
+.main {
+  max-width: 1100px;
+  margin: 0 auto;
+  background: #ffffff;
+  border: 1px solid #d8e0ef;
+  border-radius: 18px;
+  box-shadow: 0 18px 40px rgba(14, 42, 85, 0.08);
+  padding: 28px;
+  display: grid;
+  gap: 22px;
+}
+
+.header {
+  display: grid;
+  gap: 10px;
+}
+
+.header h1 {
+  font-size: 30px;
+  line-height: 1.2;
+  color: #111827;
+}
+
+.header p {
+  color: #4b5563;
+  max-width: 900px;
+}
+
+.formSection {
+  display: grid;
+  gap: 14px;
+}
+
+.athleteCard {
+  border: 1px solid #d6deec;
+  border-radius: 12px;
+  padding: 14px;
+  background-color: #f8fbff;
+  display: grid;
+  gap: 12px;
+}
+
+.cardTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.cardTop h2 {
+  font-size: 18px;
+  color: #1f2937;
+}
+
+.fieldsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 10px;
+}
+
+.fieldsGrid label {
+  display: grid;
+  gap: 6px;
+  color: #374151;
+  font-size: 14px;
+}
+
+.fieldsGrid input,
+.fieldsGrid select {
+  border: 1px solid #c3cede;
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: 15px;
+  background: #ffffff;
+}
+
+.fieldsGrid input:focus,
+.fieldsGrid select:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 1px;
+}
+
+.addButton,
+.removeButton {
+  border: none;
+  border-radius: 8px;
+  padding: 9px 12px;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.addButton {
+  justify-self: start;
+  background: #2563eb;
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.removeButton {
+  background: #fee2e2;
+  color: #b91c1c;
+  font-weight: 600;
+}
+
+.addButton:hover,
+.removeButton:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 14px rgba(15, 23, 42, 0.15);
+}
+
+.resultSection {
+  display: grid;
+  gap: 10px;
+}
+
+.resultSection h2 {
+  color: #111827;
+  font-size: 22px;
+}
+
+.tableWrapper {
+  overflow-x: auto;
+  border: 1px solid #d6deec;
+  border-radius: 10px;
+}
+
+.tableWrapper table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.tableWrapper th,
+.tableWrapper td {
+  border-bottom: 1px solid #e2e8f0;
+  text-align: left;
+  padding: 10px 12px;
+  color: #1f2937;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.tableWrapper th {
+  background: #eff6ff;
+  font-weight: 700;
+}
+
+.leaderRow {
+  background: #fef9c3;
+}
+
+@media (max-width: 768px) {
+  .main {
+    padding: 16px;
+  }
+
+  .header h1 {
+    font-size: 24px;
+  }
+}
