@@ -2,6 +2,7 @@
 
 import { nanoid } from "nanoid";
 import { useMemo, useState } from "react";
+import { saveUserData } from "@/lib/firebase";
 import styles from "./page.module.css";
 
 type Gender = "male" | "female";
@@ -43,6 +44,7 @@ export default function Home() {
   const [athletes, setAthletes] = useState<Athlete[]>([
     { id: nanoid(), name: "", gender: "", bodyWeight: "", liftedWeight: "" },
   ]);
+  const [isSaving, setIsSaving] = useState(false);
 
   const calculatedAthletes = useMemo(() => {
     return athletes
@@ -95,6 +97,23 @@ export default function Home() {
     setAthletes((current) =>
       current.map((athlete) => (athlete.id === id ? { ...athlete, [field]: value } : athlete)),
     );
+  }
+
+  async function handleSaveData() {
+    setIsSaving(true);
+    try {
+      const dataToSave = {
+        athletes: calculatedAthletes,
+        timestamp: new Date().toISOString(),
+      };
+      await saveUserData(dataToSave);
+      alert("Данные сохранены успешно!");
+    } catch (error) {
+      console.error("Ошибка сохранения:", error);
+      alert("Ошибка сохранения данных.");
+    } finally {
+      setIsSaving(false);
+    }
   }
 
   return (
@@ -205,6 +224,14 @@ export default function Home() {
               </tbody>
             </table>
           </div>
+          <button
+            type="button"
+            className={styles.saveButton}
+            onClick={handleSaveData}
+            disabled={isSaving}
+          >
+            {isSaving ? "Сохранение..." : "Сохранить данные"}
+          </button>
         </section>
       </main>
     </div>
