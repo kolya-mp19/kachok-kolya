@@ -1,5 +1,6 @@
 "use client";
 
+import { nanoid } from "nanoid";
 import { useMemo, useState } from "react";
 import styles from "./page.module.css";
 
@@ -7,7 +8,7 @@ type Gender = "male" | "female";
 type GenderValue = Gender | "";
 
 type Athlete = {
-  id: number;
+  id: string;
   name: string;
   gender: GenderValue;
   bodyWeight: string;
@@ -40,7 +41,7 @@ function calculateWilksScore(gender: Gender, bodyWeight: number, liftedWeight: n
 
 export default function Home() {
   const [athletes, setAthletes] = useState<Athlete[]>([
-    { id: 1, name: "", gender: "", bodyWeight: "", liftedWeight: "" },
+    { id: nanoid(), name: "", gender: "", bodyWeight: "", liftedWeight: "" },
   ]);
 
   const calculatedAthletes = useMemo(() => {
@@ -77,7 +78,7 @@ export default function Home() {
     setAthletes((current) => [
       ...current,
       {
-        id: Date.now(),
+        id: nanoid(),
         name: "",
         gender: "",
         bodyWeight: "",
@@ -86,11 +87,11 @@ export default function Home() {
     ]);
   }
 
-  function removeAthlete(id: number) {
+  function removeAthlete(id: string) {
     setAthletes((current) => current.filter((athlete) => athlete.id !== id));
   }
 
-  function updateAthlete(id: number, field: keyof Omit<Athlete, "id">, value: string) {
+  function updateAthlete(id: string, field: keyof Omit<Athlete, "id">, value: string) {
     setAthletes((current) =>
       current.map((athlete) => (athlete.id === id ? { ...athlete, [field]: value } : athlete)),
     );
