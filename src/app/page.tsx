@@ -4,11 +4,12 @@ import { useMemo, useState } from "react";
 import styles from "./page.module.css";
 
 type Gender = "male" | "female";
+type GenderValue = Gender | "";
 
 type Athlete = {
   id: number;
   name: string;
-  gender: Gender;
+  gender: GenderValue;
   bodyWeight: string;
   liftedWeight: string;
 };
@@ -39,8 +40,7 @@ function calculateWilksScore(gender: Gender, bodyWeight: number, liftedWeight: n
 
 export default function Home() {
   const [athletes, setAthletes] = useState<Athlete[]>([
-    { id: 1, name: "Атлет 1", gender: "male", bodyWeight: "85", liftedWeight: "70" },
-    { id: 2, name: "Атлет 2", gender: "female", bodyWeight: "62", liftedWeight: "40" },
+    { id: 1, name: "", gender: "", bodyWeight: "", liftedWeight: "" },
   ]);
 
   const calculatedAthletes = useMemo(() => {
@@ -49,7 +49,7 @@ export default function Home() {
         const bodyWeight = parsePositiveNumber(athlete.bodyWeight);
         const liftedWeight = parsePositiveNumber(athlete.liftedWeight);
 
-        if (!bodyWeight || !liftedWeight) {
+        if (!athlete.gender || !bodyWeight || !liftedWeight) {
           return {
             ...athlete,
             coefficient: null,
@@ -78,8 +78,8 @@ export default function Home() {
       ...current,
       {
         id: Date.now(),
-        name: `Атлет ${current.length + 1}`,
-        gender: "male",
+        name: "",
+        gender: "",
         bodyWeight: "",
         liftedWeight: "",
       },
@@ -108,10 +108,10 @@ export default function Home() {
         </header>
 
         <section className={styles.formSection}>
-          {athletes.map((athlete) => (
+          {athletes.map((athlete, index) => (
             <article key={athlete.id} className={styles.athleteCard}>
               <div className={styles.cardTop}>
-                <h2>{athlete.name || "Новый спортсмен"}</h2>
+                <h2>{athlete.name || `Атлет ${index + 1}`}</h2>
                 {athletes.length > 1 && (
                   <button type="button" className={styles.removeButton} onClick={() => removeAthlete(athlete.id)}>
                     Удалить
@@ -134,8 +134,11 @@ export default function Home() {
                   Пол
                   <select
                     value={athlete.gender}
-                    onChange={(event) => updateAthlete(athlete.id, "gender", event.target.value as Gender)}
+                    onChange={(event) => updateAthlete(athlete.id, "gender", event.target.value as GenderValue)}
                   >
+                    <option value="" disabled>
+                      Выберите пол
+                    </option>
                     <option value="male">Мужской</option>
                     <option value="female">Женский</option>
                   </select>

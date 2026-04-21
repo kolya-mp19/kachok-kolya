@@ -78,6 +78,15 @@
   padding: 8px 10px;
   font-size: 15px;
   background: #ffffff;
+  color: #111827;
+}
+
+.fieldsGrid input::placeholder {
+  color: #6b7280;
+}
+
+.fieldsGrid select option {
+  color: #111827;
 }
 
 .fieldsGrid input:focus,
