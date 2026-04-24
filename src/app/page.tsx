@@ -13,6 +13,7 @@ type Athlete = {
   gender: GenderValue;
   bodyWeight: string;
   attempts: [string, string, string];
+  collapsed: boolean;
 };
 
 type FormulaType = "wilks" | "ipfGl" | "dots" | "schwartzMalone";
@@ -143,7 +144,7 @@ function calculateScore(
 
 export default function Home() {
   const [athletes, setAthletes] = useState<Athlete[]>([
-    { id: nanoid(), name: "", gender: "", bodyWeight: "", attempts: ["", "", ""] },
+    { id: nanoid(), name: "", gender: "", bodyWeight: "", attempts: ["", "", ""], collapsed: false },
   ]);
   const [formula, setFormula] = useState<FormulaType>("wilks");
 
@@ -191,8 +192,17 @@ export default function Home() {
         gender: "",
         bodyWeight: "",
         attempts: ["", "", ""],
+        collapsed: false,
       },
     ]);
+  }
+
+  function toggleAthleteCollapse(id: string) {
+    setAthletes((current) =>
+      current.map((athlete) =>
+        athlete.id === id ? { ...athlete, collapsed: !athlete.collapsed } : athlete,
+      ),
+    );
   }
 
   function removeAthlete(id: string) {
@@ -231,90 +241,103 @@ export default function Home() {
             <article key={athlete.id} className={styles.athleteCard}>
               <div className={styles.cardTop}>
                 <h2>{athlete.name || `Атлет ${index + 1}`}</h2>
-                {athletes.length > 1 && (
-                  <button type="button" className={styles.removeButton} onClick={() => removeAthlete(athlete.id)}>
-                    Удалить
-                  </button>
-                )}
-              </div>
-
-              <div className={styles.fieldsGrid}>
-                <label>
-                  Имя
-                  <input
-                    type="text"
-                    value={athlete.name}
-                    onChange={(event) => updateAthlete(athlete.id, "name", event.target.value)}
-                    placeholder="Например: Иван"
-                  />
-                </label>
-
-                <label>
-                  Пол
-                  <select
-                    value={athlete.gender}
-                    onChange={(event) => updateAthlete(athlete.id, "gender", event.target.value as GenderValue)}
+                <div className={styles.cardActions}>
+                  <button
+                    type="button"
+                    className={styles.collapseButton}
+                    onClick={() => toggleAthleteCollapse(athlete.id)}
                   >
-                    <option value="" disabled>
-                      Выберите пол
-                    </option>
-                    <option value="male">Мужской</option>
-                    <option value="female">Женский</option>
-                  </select>
-                </label>
-
-                <label>
-                  Собственный вес (кг)
-                  <input
-                    type="text"
-                    inputMode="decimal"
-                    value={athlete.bodyWeight}
-                    onChange={(event) => updateAthlete(athlete.id, "bodyWeight", event.target.value)}
-                    placeholder="Например: 82.5"
-                  />
-                </label>
+                    {athlete.collapsed ? "Развернуть" : "Свернуть"}
+                  </button>
+                  {athletes.length > 1 && (
+                    <button type="button" className={styles.removeButton} onClick={() => removeAthlete(athlete.id)}>
+                      Удалить
+                    </button>
+                  )}
+                </div>
               </div>
 
-              <div className={styles.attemptsGrid}>
-                <label>
-                  Попытка 1 (кг)
-                  <input
-                    type="text"
-                    inputMode="decimal"
-                    value={athlete.attempts[0]}
-                    onChange={(event) =>
-                      updateAthlete(athlete.id, "attempts", [event.target.value, athlete.attempts[1], athlete.attempts[2]])
-                    }
-                    placeholder="Например: 70"
-                  />
-                </label>
+              {!athlete.collapsed && (
+                <>
+                  <div className={styles.fieldsGrid}>
+                    <label>
+                      Имя
+                      <input
+                        type="text"
+                        value={athlete.name}
+                        onChange={(event) => updateAthlete(athlete.id, "name", event.target.value)}
+                        placeholder="Например: Иван"
+                      />
+                    </label>
 
-                <label>
-                  Попытка 2 (кг)
-                  <input
-                    type="text"
-                    inputMode="decimal"
-                    value={athlete.attempts[1]}
-                    onChange={(event) =>
-                      updateAthlete(athlete.id, "attempts", [athlete.attempts[0], event.target.value, athlete.attempts[2]])
-                    }
-                    placeholder="Например: 72.5"
-                  />
-                </label>
+                    <label>
+                      Пол
+                      <select
+                        value={athlete.gender}
+                        onChange={(event) => updateAthlete(athlete.id, "gender", event.target.value as GenderValue)}
+                      >
+                        <option value="" disabled>
+                          Выберите пол
+                        </option>
+                        <option value="male">Мужской</option>
+                        <option value="female">Женский</option>
+                      </select>
+                    </label>
 
-                <label>
-                  Попытка 3 (кг)
-                  <input
-                    type="text"
-                    inputMode="decimal"
-                    value={athlete.attempts[2]}
-                    onChange={(event) =>
-                      updateAthlete(athlete.id, "attempts", [athlete.attempts[0], athlete.attempts[1], event.target.value])
-                    }
-                    placeholder="Например: 75"
-                  />
-                </label>
-              </div>
+                    <label>
+                      Собственный вес (кг)
+                      <input
+                        type="text"
+                        inputMode="decimal"
+                        value={athlete.bodyWeight}
+                        onChange={(event) => updateAthlete(athlete.id, "bodyWeight", event.target.value)}
+                        placeholder="Например: 82.5"
+                      />
+                    </label>
+                  </div>
+
+                  <div className={styles.attemptsGrid}>
+                    <label>
+                      Попытка 1 (кг)
+                      <input
+                        type="text"
+                        inputMode="decimal"
+                        value={athlete.attempts[0]}
+                        onChange={(event) =>
+                          updateAthlete(athlete.id, "attempts", [event.target.value, athlete.attempts[1], athlete.attempts[2]])
+                        }
+                        placeholder="Например: 70"
+                      />
+                    </label>
+
+                    <label>
+                      Попытка 2 (кг)
+                      <input
+                        type="text"
+                        inputMode="decimal"
+                        value={athlete.attempts[1]}
+                        onChange={(event) =>
+                          updateAthlete(athlete.id, "attempts", [athlete.attempts[0], event.target.value, athlete.attempts[2]])
+                        }
+                        placeholder="Например: 72.5"
+                      />
+                    </label>
+
+                    <label>
+                      Попытка 3 (кг)
+                      <input
+                        type="text"
+                        inputMode="decimal"
+                        value={athlete.attempts[2]}
+                        onChange={(event) =>
+                          updateAthlete(athlete.id, "attempts", [athlete.attempts[0], athlete.attempts[1], event.target.value])
+                        }
+                        placeholder="Например: 75"
+                      />
+                    </label>
+                  </div>
+                </>
+              )}
             </article>
           ))}
 

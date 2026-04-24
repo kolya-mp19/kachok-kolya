@@ -62,6 +62,12 @@
   gap: 12px;
 }
 
+.cardActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .cardTop h2 {
   font-size: 18px;
   color: #1f2937;
@@ -120,7 +126,8 @@
 }
 
 .addButton,
-.removeButton {
+.removeButton,
+.collapseButton {
   border: none;
   border-radius: 8px;
   padding: 9px 12px;
@@ -141,8 +148,15 @@
   font-weight: 600;
 }
 
+.collapseButton {
+  background: #e5e7eb;
+  color: #1f2937;
+  font-weight: 600;
+}
+
 .addButton:hover,
-.removeButton:hover {
+.removeButton:hover,
+.collapseButton:hover {
   transform: translateY(-1px);
   box-shadow: 0 8px 14px rgba(15, 23, 42, 0.15);
 }
