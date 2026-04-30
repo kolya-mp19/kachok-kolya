@@ -2,6 +2,8 @@
 
 import { nanoid } from "nanoid";
 import { useMemo, useState } from "react";
+import Link from "next/link";
+import { Select } from "@/uikit/select";
 import styles from "./page.module.css";
 
 type Gender = "male" | "female";
@@ -224,17 +226,18 @@ export default function Home() {
             Добавляйте спортсменов, указывайте пол, собственный вес и до 3 попыток. Рейтинг автоматически сортируется
             по лучшей попытке и выбранной формуле.
           </p>
+          <Link href="/workout" className={styles.workoutLink}>Тренировочный трекер →</Link>
         </header>
 
         <section className={styles.formSection}>
           <label className={styles.formulaLabel}>
             Формула расчета
-            <select value={formula} onChange={(event) => setFormula(event.target.value as FormulaType)}>
+            <Select value={formula} onChange={(event) => setFormula(event.target.value as FormulaType)}>
               <option value="wilks">Уилкс</option>
               <option value="ipfGl">IPF GL Points</option>
               <option value="dots">DOTS</option>
               <option value="schwartzMalone">Schwartz/Malone</option>
-            </select>
+            </Select>
           </label>
 
           {athletes.map((athlete, index) => (
@@ -272,7 +275,7 @@ export default function Home() {
 
                     <label>
                       Пол
-                      <select
+                      <Select
                         value={athlete.gender}
                         onChange={(event) => updateAthlete(athlete.id, "gender", event.target.value as GenderValue)}
                       >
@@ -281,7 +284,7 @@ export default function Home() {
                         </option>
                         <option value="male">Мужской</option>
                         <option value="female">Женский</option>
-                      </select>
+                      </Select>
                     </label>
 
                     <label>

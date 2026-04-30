@@ -1,0 +1,15 @@
+.select {
+  border: 1px solid #c3cede;
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: 15px;
+  background: #ffffff;
+  color: #111827;
+  width: 100%;
+  cursor: pointer;
+}
+
+.select:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 1px;
+}
