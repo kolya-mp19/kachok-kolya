@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install *)",
+      "Bash(Remove-Item \"d:\\\\projects\\\\kachok-kolya\\\\src\\\\components\\\\ui\\\\input\\\\.gitkeep\" -Force)",
+      "Bash(Remove-Item \"d:\\\\projects\\\\kachok-kolya\\\\src\\\\components\\\\ui\\\\select\\\\.gitkeep\" -Force)",
+      "Bash(npm run *)",
+      "Bash(Remove-Item \"d:\\\\projects\\\\kachok-kolya\\\\src\\\\types\\\\.gitkeep\")",
+      "Bash(Remove-Item \"d:\\\\projects\\\\kachok-kolya\\\\src\\\\lib\\\\utils\\\\.gitkeep\" -Force)",
+      "Bash(Remove-Item \"d:\\\\projects\\\\kachok-kolya\\\\src\\\\lib\\\\constants\\\\.gitkeep\" -Force)",
+      "Bash(Remove-Item \"d:\\\\projects\\\\kachok-kolya\\\\src\\\\components\\\\athlete\\\\.gitkeep\")"
+    ]
+  }
+}

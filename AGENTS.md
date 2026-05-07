@@ -1,22 +1,31 @@
 <!-- BEGIN:nextjs-agent-rules -->
+
 # This is NOT the Next.js you know
 
 This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing any code. Heed deprecation notices.
+
 <!-- END:nextjs-agent-rules -->
 
 # Project Agent Guide
 
 ## Scope
+
 - This repository is a client-side strength coefficient calculator built on Next.js App Router.
 - Core page is `src/app/page.tsx`, styles are in `src/app/page.module.css`.
 
 ## Product Expectations
+
 - UI language is Russian by default.
 - Ranking updates immediately after input changes.
 - Athlete ranking is based on computed score from best valid attempt.
 - Users can select calculation formula (Wilks, IPF GL, DOTS, Schwartz/Malone).
 
 ## Coding Rules
+
+- All folder names must be lowercase. Multi-word folder names use kebab-case (words separated by hyphens).
+  Examples: `athlete-card/`, `form-fields/`, `use-athletes/`
+  Wrong: `AthleteCard/`, `athleteCard/`, `FormFields/`, `form_fields/`
+  This rule applies to every folder in the project without exception, including inside `src/`, `public/`, and any future directories.
 - Prefer focused, minimal edits over large refactors.
 - Keep business logic in small typed helper functions.
 - Avoid `any`; keep strict TypeScript-friendly updates.
@@ -29,6 +38,7 @@ This version has breaking changes — APIs, conventions, and file structure may 
 - Avoid duplicated logic; extract shared calculations into pure functions.
 
 ## Form and Validation Rules
+
 - Numeric fields must accept both comma and dot decimals.
 - Treat empty/invalid/non-positive values as missing data.
 - Keep incomplete athletes visible in table with placeholders rather than crashing logic.
@@ -39,6 +49,7 @@ This version has breaking changes — APIs, conventions, and file structure may 
   - table rendering.
 
 ## Styling Rules
+
 - Reuse existing CSS module patterns and color palette.
 - Keep control styles consistent across `input` and `select`.
 - Maintain responsive behavior for mobile (`max-width: 768px`).
@@ -47,12 +58,14 @@ This version has breaking changes — APIs, conventions, and file structure may 
 - Prefer adding classes over inline styles.
 
 ## UX Rules
+
 - Do not hide important actions behind hover-only interactions.
 - Collapsible content must keep entered data intact.
 - Sorting/ranking behavior must remain predictable after UI changes.
 - Text labels should be concise and user-facing (no technical wording).
 
 ## Testing and Verification
+
 - After substantive edits, check lints for changed files.
 - If dev server is running, verify affected flows manually:
   - add athlete,
@@ -63,6 +76,7 @@ This version has breaking changes — APIs, conventions, and file structure may 
 - If something cannot be verified locally, state it explicitly in the final report.
 
 ## Commit Message Convention
+
 - Use concise, intention-first messages.
 - Recommended format:
   - `feat: ...` for new capabilities
@@ -72,6 +86,7 @@ This version has breaking changes — APIs, conventions, and file structure may 
 - Keep subject line in imperative mood and under ~72 chars when possible.
 
 ## Delivery Checklist
+
 - Run lint diagnostics for changed files after substantive edits.
 - Preserve existing features unless explicitly asked to remove them.
 - Keep UI state durable (e.g., collapse toggles should not clear form data).

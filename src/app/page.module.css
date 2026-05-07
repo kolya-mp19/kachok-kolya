@@ -38,168 +38,13 @@
 }
 
 .formulaLabel {
-  display: grid;
-  gap: 6px;
-  color: #111827;
-  font-size: 14px;
-  font-weight: 600;
   max-width: 320px;
-}
-
-.athleteCard {
-  border: 1px solid #d6deec;
-  border-radius: 12px;
-  padding: 14px;
-  background-color: #f8fbff;
-  display: grid;
-  gap: 12px;
-}
-
-.cardTop {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-}
-
-.cardActions {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.cardTop h2 {
-  font-size: 18px;
-  color: #1f2937;
-}
-
-.fieldsGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 10px;
-}
-
-.fieldsGrid label,
-.attemptsGrid label {
-  display: grid;
-  gap: 6px;
-  color: #374151;
-  font-size: 14px;
-}
-
-.fieldsGrid input,
-.fieldsGrid select,
-.attemptsGrid input,
-.formulaLabel select {
-  border: 1px solid #c3cede;
-  border-radius: 8px;
-  padding: 8px 10px;
-  font-size: 15px;
-  background: #ffffff;
-  color: #111827;
-}
-
-.fieldsGrid input::placeholder {
-  color: #6b7280;
-}
-
-.attemptsGrid input::placeholder {
-  color: #6b7280;
-}
-
-.fieldsGrid select option {
-  color: #111827;
-}
-
-.fieldsGrid input:focus,
-.fieldsGrid select:focus,
-.attemptsGrid input:focus,
-.formulaLabel select:focus {
-  outline: 2px solid #3b82f6;
-  outline-offset: 1px;
-}
-
-.attemptsGrid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 10px;
-}
-
-.addButton,
-.removeButton,
-.collapseButton {
-  border: none;
-  border-radius: 8px;
-  padding: 9px 12px;
-  cursor: pointer;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
 .addButton {
   justify-self: start;
-  background: #2563eb;
-  color: #ffffff;
-  font-weight: 600;
 }
 
-.removeButton {
-  background: #fee2e2;
-  color: #b91c1c;
-  font-weight: 600;
-}
-
-.collapseButton {
-  background: #e5e7eb;
-  color: #1f2937;
-  font-weight: 600;
-}
-
-.addButton:hover,
-.removeButton:hover,
-.collapseButton:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 8px 14px rgba(15, 23, 42, 0.15);
-}
-
-.resultSection {
-  display: grid;
-  gap: 10px;
-}
-
-.resultSection h2 {
-  color: #111827;
-  font-size: 22px;
-}
-
-.tableWrapper {
-  overflow-x: auto;
-  border: 1px solid #d6deec;
-  border-radius: 10px;
-}
-
-.tableWrapper table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.tableWrapper th,
-.tableWrapper td {
-  border-bottom: 1px solid #e2e8f0;
-  text-align: left;
-  padding: 10px 12px;
-  color: #1f2937;
-  font-size: 14px;
-  white-space: nowrap;
-}
-
-.tableWrapper th {
-  background: #eff6ff;
-  font-weight: 700;
-}
-
-.leaderRow {
-  background: #fef9c3;
-}
 
 @media (max-width: 768px) {
   .main {
@@ -210,7 +55,4 @@
     font-size: 24px;
   }
 
-  .attemptsGrid {
-    grid-template-columns: 1fr;
-  }
 }
