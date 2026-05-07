@@ -2,25 +2,13 @@
 
 import { nanoid } from 'nanoid';
 import { useMemo, useState } from 'react';
-import type { FormulaType } from '../lib/calculations';
+import type { GenderValue, Athlete, FormulaType } from '../types';
 import Button from '../components/ui/button/Button';
 import CoefficientsTable from '../components/table/coefficients-table/CoefficientsTable';
 import InputField from '../components/ui/input/InputField';
 import SelectField from '../components/ui/select/SelectField';
 import { calculateScore } from '../lib/calculations';
 import styles from './page.module.css';
-
-type Gender = 'male' | 'female';
-type GenderValue = Gender | '';
-
-type Athlete = {
-  id: string;
-  name: string;
-  gender: GenderValue;
-  bodyWeight: string;
-  attempts: [string, string, string];
-  collapsed: boolean;
-};
 
 const FORMULA_LABELS: Record<FormulaType, string> = {
   wilks: 'Уилкс',

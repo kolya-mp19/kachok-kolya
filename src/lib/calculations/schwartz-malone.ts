@@ -1,4 +1,4 @@
-type Gender = 'male' | 'female';
+import type { Gender } from '../../types';
 
 function calculateSchwartzCoefficient(bodyWeight: number): number {
   const adjusted = Math.min(Math.max(bodyWeight, 40), 166);

@@ -1,10 +1,8 @@
+import type { Gender, FormulaType } from '../../types';
 import { calculateWilksScore } from './wilks';
 import { calculateIpfGlScore } from './ipf-gl';
 import { calculateDotsScore } from './dots';
 import { calculateSchwartzMaloneScore } from './schwartz-malone';
-
-type Gender = 'male' | 'female';
-type FormulaType = 'wilks' | 'ipfGl' | 'dots' | 'schwartzMalone';
 
 function calculateScore(
   formula: FormulaType,
@@ -26,5 +24,4 @@ function calculateScore(
   }
 }
 
-export type { FormulaType };
 export { calculateScore };

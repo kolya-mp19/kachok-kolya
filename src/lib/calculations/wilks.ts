@@ -1,4 +1,4 @@
-type Gender = 'male' | 'female';
+import type { Gender } from '../../types';
 
 const WILKS_COEFFICIENTS: Record<Gender, [number, number, number, number, number, number]> = {
   male: [-216.0475144, 16.2606339, -0.002388645, -0.00113732, 0.00000701863, -0.00000001291],

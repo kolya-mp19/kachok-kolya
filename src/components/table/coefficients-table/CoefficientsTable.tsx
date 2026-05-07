@@ -1,18 +1,6 @@
 import { typedTable } from '../../ui/table/Table';
+import type { CalculatedAthlete } from '../../../types';
 import styles from './CoefficientsTable.module.css';
-
-type Gender = 'male' | 'female';
-type GenderValue = Gender | '';
-
-type CalculatedAthlete = {
-  id: string;
-  name: string;
-  gender: GenderValue;
-  bodyWeight: string;
-  bestAttempt: number | null;
-  coefficient: number | null;
-  score: number | null;
-};
 
 type CoefficientsTableProps = {
   athletes: CalculatedAthlete[];

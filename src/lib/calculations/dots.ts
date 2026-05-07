@@ -1,4 +1,4 @@
-type Gender = 'male' | 'female';
+import type { Gender } from '../../types';
 
 const DOTS_COEFFICIENTS: Record<Gender, [number, number, number, number, number]> = {
   male: [-307.75076, 24.0900756, -0.1918759221, 0.0007391293, -0.000001093],

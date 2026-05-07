@@ -1,4 +1,4 @@
-type Gender = 'male' | 'female';
+import type { Gender } from '../../types';
 
 const IPF_GL_CLASSIC_COEFFICIENTS: Record<Gender, [number, number, number]> = {
   male: [1199.72839, 1025.18162, 0.00921],
