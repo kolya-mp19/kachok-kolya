@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import { nanoid } from "nanoid";
-import { useMemo, useState } from "react";
-import styles from "./page.module.css";
+import { nanoid } from 'nanoid';
+import { useMemo, useState } from 'react';
+import styles from './page.module.css';
 
-type Gender = "male" | "female";
-type GenderValue = Gender | "";
+type Gender = 'male' | 'female';
+type GenderValue = Gender | '';
 
 type Athlete = {
   id: string;
@@ -16,18 +16,20 @@ type Athlete = {
   collapsed: boolean;
 };
 
-type FormulaType = "wilks" | "ipfGl" | "dots" | "schwartzMalone";
+type FormulaType = 'wilks' | 'ipfGl' | 'dots' | 'schwartzMalone';
 
 const FORMULA_LABELS: Record<FormulaType, string> = {
-  wilks: "Уилкс",
-  ipfGl: "IPF GL Points",
-  dots: "DOTS",
-  schwartzMalone: "Schwartz/Malone",
+  wilks: 'Уилкс',
+  ipfGl: 'IPF GL Points',
+  dots: 'DOTS',
+  schwartzMalone: 'Schwartz/Malone',
 };
 
 const WILKS_COEFFICIENTS: Record<Gender, [number, number, number, number, number, number]> = {
   male: [-216.0475144, 16.2606339, -0.002388645, -0.00113732, 0.00000701863, -0.00000001291],
-  female: [594.31747775582, -27.23842536447, 0.82112226871, -0.00930733913, 0.00004731582, -0.00000009054],
+  female: [
+    594.31747775582, -27.23842536447, 0.82112226871, -0.00930733913, 0.00004731582, -0.00000009054,
+  ],
 };
 
 const IPF_GL_CLASSIC_COEFFICIENTS: Record<Gender, [number, number, number]> = {
@@ -45,21 +47,35 @@ function parsePositiveNumber(value: string): number | null {
     return null;
   }
 
-  const normalized = value.replace(",", ".");
+  const normalized = value.replace(',', '.');
   const parsed = Number(normalized);
   return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
 }
 
-function calculateWilksScore(gender: Gender, bodyWeight: number, liftedWeight: number): { coefficient: number; score: number } {
+function calculateWilksScore(
+  gender: Gender,
+  bodyWeight: number,
+  liftedWeight: number
+): { coefficient: number; score: number } {
   const [a, b, c, d, e, f] = WILKS_COEFFICIENTS[gender];
-  const denominator = a + b * bodyWeight + c * bodyWeight ** 2 + d * bodyWeight ** 3 + e * bodyWeight ** 4 + f * bodyWeight ** 5;
+  const denominator =
+    a +
+    b * bodyWeight +
+    c * bodyWeight ** 2 +
+    d * bodyWeight ** 3 +
+    e * bodyWeight ** 4 +
+    f * bodyWeight ** 5;
   const coefficient = 500 / denominator;
   const score = coefficient * liftedWeight;
 
   return { coefficient, score };
 }
 
-function calculateIpfGlScore(gender: Gender, bodyWeight: number, liftedWeight: number): { coefficient: number; score: number } {
+function calculateIpfGlScore(
+  gender: Gender,
+  bodyWeight: number,
+  liftedWeight: number
+): { coefficient: number; score: number } {
   const [a, b, c] = IPF_GL_CLASSIC_COEFFICIENTS[gender];
   const denominator = a - b * Math.exp(-c * bodyWeight);
   const coefficient = 100 / denominator;
@@ -68,9 +84,14 @@ function calculateIpfGlScore(gender: Gender, bodyWeight: number, liftedWeight: n
   return { coefficient, score };
 }
 
-function calculateDotsScore(gender: Gender, bodyWeight: number, liftedWeight: number): { coefficient: number; score: number } {
+function calculateDotsScore(
+  gender: Gender,
+  bodyWeight: number,
+  liftedWeight: number
+): { coefficient: number; score: number } {
   const [a, b, c, d, e] = DOTS_COEFFICIENTS[gender];
-  const denominator = a + b * bodyWeight + c * bodyWeight ** 2 + d * bodyWeight ** 3 + e * bodyWeight ** 4;
+  const denominator =
+    a + b * bodyWeight + c * bodyWeight ** 2 + d * bodyWeight ** 3 + e * bodyWeight ** 4;
   const coefficient = 500 / denominator;
   const score = coefficient * liftedWeight;
 
@@ -115,8 +136,15 @@ function calculateMaloneCoefficient(bodyWeight: number): number {
   return a * adjusted ** b + c;
 }
 
-function calculateSchwartzMaloneScore(gender: Gender, bodyWeight: number, liftedWeight: number): { coefficient: number; score: number } {
-  const coefficient = gender === "male" ? calculateSchwartzCoefficient(bodyWeight) : calculateMaloneCoefficient(bodyWeight);
+function calculateSchwartzMaloneScore(
+  gender: Gender,
+  bodyWeight: number,
+  liftedWeight: number
+): { coefficient: number; score: number } {
+  const coefficient =
+    gender === 'male'
+      ? calculateSchwartzCoefficient(bodyWeight)
+      : calculateMaloneCoefficient(bodyWeight);
   const score = coefficient * liftedWeight;
 
   return { coefficient, score };
@@ -126,16 +154,16 @@ function calculateScore(
   formula: FormulaType,
   gender: Gender,
   bodyWeight: number,
-  liftedWeight: number,
+  liftedWeight: number
 ): { coefficient: number; score: number } {
   switch (formula) {
-    case "wilks":
+    case 'wilks':
       return calculateWilksScore(gender, bodyWeight, liftedWeight);
-    case "ipfGl":
+    case 'ipfGl':
       return calculateIpfGlScore(gender, bodyWeight, liftedWeight);
-    case "dots":
+    case 'dots':
       return calculateDotsScore(gender, bodyWeight, liftedWeight);
-    case "schwartzMalone":
+    case 'schwartzMalone':
       return calculateSchwartzMaloneScore(gender, bodyWeight, liftedWeight);
     default:
       return calculateWilksScore(gender, bodyWeight, liftedWeight);
@@ -144,9 +172,16 @@ function calculateScore(
 
 export default function Home() {
   const [athletes, setAthletes] = useState<Athlete[]>([
-    { id: nanoid(), name: "", gender: "", bodyWeight: "", attempts: ["", "", ""], collapsed: false },
+    {
+      id: nanoid(),
+      name: '',
+      gender: '',
+      bodyWeight: '',
+      attempts: ['', '', ''],
+      collapsed: false,
+    },
   ]);
-  const [formula, setFormula] = useState<FormulaType>("wilks");
+  const [formula, setFormula] = useState<FormulaType>('wilks');
 
   const calculatedAthletes = useMemo(() => {
     return athletes
@@ -166,7 +201,12 @@ export default function Home() {
           };
         }
 
-        const { coefficient, score } = calculateScore(formula, athlete.gender, bodyWeight, bestAttempt);
+        const { coefficient, score } = calculateScore(
+          formula,
+          athlete.gender,
+          bodyWeight,
+          bestAttempt
+        );
         return {
           ...athlete,
           bestAttempt,
@@ -188,10 +228,10 @@ export default function Home() {
       ...current,
       {
         id: nanoid(),
-        name: "",
-        gender: "",
-        bodyWeight: "",
-        attempts: ["", "", ""],
+        name: '',
+        gender: '',
+        bodyWeight: '',
+        attempts: ['', '', ''],
         collapsed: false,
       },
     ]);
@@ -200,8 +240,8 @@ export default function Home() {
   function toggleAthleteCollapse(id: string) {
     setAthletes((current) =>
       current.map((athlete) =>
-        athlete.id === id ? { ...athlete, collapsed: !athlete.collapsed } : athlete,
-      ),
+        athlete.id === id ? { ...athlete, collapsed: !athlete.collapsed } : athlete
+      )
     );
   }
 
@@ -209,9 +249,13 @@ export default function Home() {
     setAthletes((current) => current.filter((athlete) => athlete.id !== id));
   }
 
-  function updateAthlete<K extends keyof Omit<Athlete, "id">>(id: string, field: K, value: Omit<Athlete, "id">[K]) {
+  function updateAthlete<K extends keyof Omit<Athlete, 'id'>>(
+    id: string,
+    field: K,
+    value: Omit<Athlete, 'id'>[K]
+  ) {
     setAthletes((current) =>
-      current.map((athlete) => (athlete.id === id ? { ...athlete, [field]: value } : athlete)),
+      current.map((athlete) => (athlete.id === id ? { ...athlete, [field]: value } : athlete))
     );
   }
 
@@ -221,15 +265,18 @@ export default function Home() {
         <header className={styles.header}>
           <h1>Калькулятор коэффициентов силы</h1>
           <p>
-            Добавляйте спортсменов, указывайте пол, собственный вес и до 3 попыток. Рейтинг автоматически сортируется
-            по лучшей попытке и выбранной формуле.
+            Добавляйте спортсменов, указывайте пол, собственный вес и до 3 попыток. Рейтинг
+            автоматически сортируется по лучшей попытке и выбранной формуле.
           </p>
         </header>
 
         <section className={styles.formSection}>
           <label className={styles.formulaLabel}>
             Формула расчета
-            <select value={formula} onChange={(event) => setFormula(event.target.value as FormulaType)}>
+            <select
+              value={formula}
+              onChange={(event) => setFormula(event.target.value as FormulaType)}
+            >
               <option value="wilks">Уилкс</option>
               <option value="ipfGl">IPF GL Points</option>
               <option value="dots">DOTS</option>
@@ -247,10 +294,14 @@ export default function Home() {
                     className={styles.collapseButton}
                     onClick={() => toggleAthleteCollapse(athlete.id)}
                   >
-                    {athlete.collapsed ? "Развернуть" : "Свернуть"}
+                    {athlete.collapsed ? 'Развернуть' : 'Свернуть'}
                   </button>
                   {athletes.length > 1 && (
-                    <button type="button" className={styles.removeButton} onClick={() => removeAthlete(athlete.id)}>
+                    <button
+                      type="button"
+                      className={styles.removeButton}
+                      onClick={() => removeAthlete(athlete.id)}
+                    >
                       Удалить
                     </button>
                   )}
@@ -265,7 +316,7 @@ export default function Home() {
                       <input
                         type="text"
                         value={athlete.name}
-                        onChange={(event) => updateAthlete(athlete.id, "name", event.target.value)}
+                        onChange={(event) => updateAthlete(athlete.id, 'name', event.target.value)}
                         placeholder="Например: Иван"
                       />
                     </label>
@@ -274,7 +325,9 @@ export default function Home() {
                       Пол
                       <select
                         value={athlete.gender}
-                        onChange={(event) => updateAthlete(athlete.id, "gender", event.target.value as GenderValue)}
+                        onChange={(event) =>
+                          updateAthlete(athlete.id, 'gender', event.target.value as GenderValue)
+                        }
                       >
                         <option value="" disabled>
                           Выберите пол
@@ -290,7 +343,9 @@ export default function Home() {
                         type="text"
                         inputMode="decimal"
                         value={athlete.bodyWeight}
-                        onChange={(event) => updateAthlete(athlete.id, "bodyWeight", event.target.value)}
+                        onChange={(event) =>
+                          updateAthlete(athlete.id, 'bodyWeight', event.target.value)
+                        }
                         placeholder="Например: 82.5"
                       />
                     </label>
@@ -304,7 +359,11 @@ export default function Home() {
                         inputMode="decimal"
                         value={athlete.attempts[0]}
                         onChange={(event) =>
-                          updateAthlete(athlete.id, "attempts", [event.target.value, athlete.attempts[1], athlete.attempts[2]])
+                          updateAthlete(athlete.id, 'attempts', [
+                            event.target.value,
+                            athlete.attempts[1],
+                            athlete.attempts[2],
+                          ])
                         }
                         placeholder="Например: 70"
                       />
@@ -317,7 +376,11 @@ export default function Home() {
                         inputMode="decimal"
                         value={athlete.attempts[1]}
                         onChange={(event) =>
-                          updateAthlete(athlete.id, "attempts", [athlete.attempts[0], event.target.value, athlete.attempts[2]])
+                          updateAthlete(athlete.id, 'attempts', [
+                            athlete.attempts[0],
+                            event.target.value,
+                            athlete.attempts[2],
+                          ])
                         }
                         placeholder="Например: 72.5"
                       />
@@ -330,7 +393,11 @@ export default function Home() {
                         inputMode="decimal"
                         value={athlete.attempts[2]}
                         onChange={(event) =>
-                          updateAthlete(athlete.id, "attempts", [athlete.attempts[0], athlete.attempts[1], event.target.value])
+                          updateAthlete(athlete.id, 'attempts', [
+                            athlete.attempts[0],
+                            athlete.attempts[1],
+                            event.target.value,
+                          ])
                         }
                         placeholder="Например: 75"
                       />
@@ -363,14 +430,16 @@ export default function Home() {
               </thead>
               <tbody>
                 {calculatedAthletes.map((athlete, index) => (
-                  <tr key={athlete.id} className={athlete.id === leaderId ? styles.leaderRow : ""}>
+                  <tr key={athlete.id} className={athlete.id === leaderId ? styles.leaderRow : ''}>
                     <td>{index + 1}</td>
-                    <td>{athlete.name || "Без имени"}</td>
-                    <td>{athlete.gender === "male" ? "М" : athlete.gender === "female" ? "Ж" : "—"}</td>
-                    <td>{athlete.bodyWeight || "—"}</td>
-                    <td>{athlete.bestAttempt !== null ? athlete.bestAttempt.toFixed(2) : "—"}</td>
-                    <td>{athlete.coefficient !== null ? athlete.coefficient.toFixed(3) : "—"}</td>
-                    <td>{athlete.score !== null ? athlete.score.toFixed(2) : "—"}</td>
+                    <td>{athlete.name || 'Без имени'}</td>
+                    <td>
+                      {athlete.gender === 'male' ? 'М' : athlete.gender === 'female' ? 'Ж' : '—'}
+                    </td>
+                    <td>{athlete.bodyWeight || '—'}</td>
+                    <td>{athlete.bestAttempt !== null ? athlete.bestAttempt.toFixed(2) : '—'}</td>
+                    <td>{athlete.coefficient !== null ? athlete.coefficient.toFixed(3) : '—'}</td>
+                    <td>{athlete.score !== null ? athlete.score.toFixed(2) : '—'}</td>
                   </tr>
                 ))}
               </tbody>
