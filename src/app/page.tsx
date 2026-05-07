@@ -2,6 +2,12 @@
 
 import { nanoid } from 'nanoid';
 import { useMemo, useState } from 'react';
+import type { FormulaType } from '../lib/calculations';
+import Button from '../components/ui/button/Button';
+import CoefficientsTable from '../components/table/coefficients-table/CoefficientsTable';
+import InputField from '../components/ui/input/InputField';
+import SelectField from '../components/ui/select/SelectField';
+import { calculateScore } from '../lib/calculations';
 import styles from './page.module.css';
 
 type Gender = 'male' | 'female';
@@ -16,30 +22,11 @@ type Athlete = {
   collapsed: boolean;
 };
 
-type FormulaType = 'wilks' | 'ipfGl' | 'dots' | 'schwartzMalone';
-
 const FORMULA_LABELS: Record<FormulaType, string> = {
   wilks: 'Уилкс',
   ipfGl: 'IPF GL Points',
   dots: 'DOTS',
   schwartzMalone: 'Schwartz/Malone',
-};
-
-const WILKS_COEFFICIENTS: Record<Gender, [number, number, number, number, number, number]> = {
-  male: [-216.0475144, 16.2606339, -0.002388645, -0.00113732, 0.00000701863, -0.00000001291],
-  female: [
-    594.31747775582, -27.23842536447, 0.82112226871, -0.00930733913, 0.00004731582, -0.00000009054,
-  ],
-};
-
-const IPF_GL_CLASSIC_COEFFICIENTS: Record<Gender, [number, number, number]> = {
-  male: [1199.72839, 1025.18162, 0.00921],
-  female: [610.32796, 1045.59282, 0.03048],
-};
-
-const DOTS_COEFFICIENTS: Record<Gender, [number, number, number, number, number]> = {
-  male: [-307.75076, 24.0900756, -0.1918759221, 0.0007391293, -0.000001093],
-  female: [-57.96288, 13.6175032, -0.1126655495, 0.0005158568, -0.0000010706],
 };
 
 function parsePositiveNumber(value: string): number | null {
@@ -50,124 +37,6 @@ function parsePositiveNumber(value: string): number | null {
   const normalized = value.replace(',', '.');
   const parsed = Number(normalized);
   return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
-}
-
-function calculateWilksScore(
-  gender: Gender,
-  bodyWeight: number,
-  liftedWeight: number
-): { coefficient: number; score: number } {
-  const [a, b, c, d, e, f] = WILKS_COEFFICIENTS[gender];
-  const denominator =
-    a +
-    b * bodyWeight +
-    c * bodyWeight ** 2 +
-    d * bodyWeight ** 3 +
-    e * bodyWeight ** 4 +
-    f * bodyWeight ** 5;
-  const coefficient = 500 / denominator;
-  const score = coefficient * liftedWeight;
-
-  return { coefficient, score };
-}
-
-function calculateIpfGlScore(
-  gender: Gender,
-  bodyWeight: number,
-  liftedWeight: number
-): { coefficient: number; score: number } {
-  const [a, b, c] = IPF_GL_CLASSIC_COEFFICIENTS[gender];
-  const denominator = a - b * Math.exp(-c * bodyWeight);
-  const coefficient = 100 / denominator;
-  const score = coefficient * liftedWeight;
-
-  return { coefficient, score };
-}
-
-function calculateDotsScore(
-  gender: Gender,
-  bodyWeight: number,
-  liftedWeight: number
-): { coefficient: number; score: number } {
-  const [a, b, c, d, e] = DOTS_COEFFICIENTS[gender];
-  const denominator =
-    a + b * bodyWeight + c * bodyWeight ** 2 + d * bodyWeight ** 3 + e * bodyWeight ** 4;
-  const coefficient = 500 / denominator;
-  const score = coefficient * liftedWeight;
-
-  return { coefficient, score };
-}
-
-function calculateSchwartzCoefficient(bodyWeight: number): number {
-  const adjusted = Math.min(Math.max(bodyWeight, 40), 166);
-
-  if (adjusted <= 126) {
-    const x0 = 0.631926 * 10;
-    const x1 = 0.262349 * adjusted;
-    const x2 = 0.51155 * 10 ** -2 * adjusted ** 2;
-    const x3 = 0.519738 * 10 ** -4 * adjusted ** 3;
-    const x4 = 0.267626 * 10 ** -6 * adjusted ** 4;
-    const x5 = 0.540132 * 10 ** -9 * adjusted ** 5;
-    const x6 = 0.728875 * 10 ** -13 * adjusted ** 6;
-    return x0 - x1 + x2 - x3 + x4 - x5 - x6;
-  }
-
-  if (adjusted <= 136) {
-    return 0.521 - 0.0012 * (adjusted - 125);
-  }
-
-  if (adjusted <= 146) {
-    return 0.509 - 0.0011 * (adjusted - 135);
-  }
-
-  if (adjusted <= 156) {
-    return 0.498 - 0.001 * (adjusted - 145);
-  }
-
-  return 0.4879 - 0.00088185 * (adjusted - 155);
-}
-
-function calculateMaloneCoefficient(bodyWeight: number): number {
-  const a = 106.011586323613;
-  const b = -1.293027130579051;
-  const c = 0.322935585328304;
-  const adjusted = Math.max(bodyWeight, 29.24);
-
-  return a * adjusted ** b + c;
-}
-
-function calculateSchwartzMaloneScore(
-  gender: Gender,
-  bodyWeight: number,
-  liftedWeight: number
-): { coefficient: number; score: number } {
-  const coefficient =
-    gender === 'male'
-      ? calculateSchwartzCoefficient(bodyWeight)
-      : calculateMaloneCoefficient(bodyWeight);
-  const score = coefficient * liftedWeight;
-
-  return { coefficient, score };
-}
-
-function calculateScore(
-  formula: FormulaType,
-  gender: Gender,
-  bodyWeight: number,
-  liftedWeight: number
-): { coefficient: number; score: number } {
-  switch (formula) {
-    case 'wilks':
-      return calculateWilksScore(gender, bodyWeight, liftedWeight);
-    case 'ipfGl':
-      return calculateIpfGlScore(gender, bodyWeight, liftedWeight);
-    case 'dots':
-      return calculateDotsScore(gender, bodyWeight, liftedWeight);
-    case 'schwartzMalone':
-      return calculateSchwartzMaloneScore(gender, bodyWeight, liftedWeight);
-    default:
-      return calculateWilksScore(gender, bodyWeight, liftedWeight);
-  }
 }
 
 export default function Home() {
@@ -271,39 +140,32 @@ export default function Home() {
         </header>
 
         <section className={styles.formSection}>
-          <label className={styles.formulaLabel}>
-            Формула расчета
-            <select
+          <div className={styles.formulaLabel}>
+            <SelectField
+              label="Формула расчета"
               value={formula}
-              onChange={(event) => setFormula(event.target.value as FormulaType)}
-            >
-              <option value="wilks">Уилкс</option>
-              <option value="ipfGl">IPF GL Points</option>
-              <option value="dots">DOTS</option>
-              <option value="schwartzMalone">Schwartz/Malone</option>
-            </select>
-          </label>
+              onChange={(value) => setFormula(value as FormulaType)}
+              options={[
+                { value: 'wilks', label: 'Уилкс' },
+                { value: 'ipfGl', label: 'IPF GL Points' },
+                { value: 'dots', label: 'DOTS' },
+                { value: 'schwartzMalone', label: 'Schwartz/Malone' },
+              ]}
+            />
+          </div>
 
           {athletes.map((athlete, index) => (
             <article key={athlete.id} className={styles.athleteCard}>
               <div className={styles.cardTop}>
                 <h2>{athlete.name || `Атлет ${index + 1}`}</h2>
                 <div className={styles.cardActions}>
-                  <button
-                    type="button"
-                    className={styles.collapseButton}
-                    onClick={() => toggleAthleteCollapse(athlete.id)}
-                  >
+                  <Button variant="ghost" onClick={() => toggleAthleteCollapse(athlete.id)}>
                     {athlete.collapsed ? 'Развернуть' : 'Свернуть'}
-                  </button>
+                  </Button>
                   {athletes.length > 1 && (
-                    <button
-                      type="button"
-                      className={styles.removeButton}
-                      onClick={() => removeAthlete(athlete.id)}
-                    >
+                    <Button variant="danger" onClick={() => removeAthlete(athlete.id)}>
                       Удалить
-                    </button>
+                    </Button>
                   )}
                 </div>
               </div>
@@ -311,141 +173,93 @@ export default function Home() {
               {!athlete.collapsed && (
                 <>
                   <div className={styles.fieldsGrid}>
-                    <label>
-                      Имя
-                      <input
-                        type="text"
-                        value={athlete.name}
-                        onChange={(event) => updateAthlete(athlete.id, 'name', event.target.value)}
-                        placeholder="Например: Иван"
-                      />
-                    </label>
+                    <InputField
+                      label="Имя"
+                      value={athlete.name}
+                      onChange={(value) => updateAthlete(athlete.id, 'name', value)}
+                      placeholder="Например: Иван"
+                    />
 
-                    <label>
-                      Пол
-                      <select
-                        value={athlete.gender}
-                        onChange={(event) =>
-                          updateAthlete(athlete.id, 'gender', event.target.value as GenderValue)
-                        }
-                      >
-                        <option value="" disabled>
-                          Выберите пол
-                        </option>
-                        <option value="male">Мужской</option>
-                        <option value="female">Женский</option>
-                      </select>
-                    </label>
+                    <SelectField
+                      label="Пол"
+                      value={athlete.gender}
+                      onChange={(value) =>
+                        updateAthlete(athlete.id, 'gender', value as GenderValue)
+                      }
+                      options={[
+                        { value: '', label: 'Выберите пол', disabled: true },
+                        { value: 'male', label: 'Мужской' },
+                        { value: 'female', label: 'Женский' },
+                      ]}
+                    />
 
-                    <label>
-                      Собственный вес (кг)
-                      <input
-                        type="text"
-                        inputMode="decimal"
-                        value={athlete.bodyWeight}
-                        onChange={(event) =>
-                          updateAthlete(athlete.id, 'bodyWeight', event.target.value)
-                        }
-                        placeholder="Например: 82.5"
-                      />
-                    </label>
+                    <InputField
+                      label="Собственный вес (кг)"
+                      value={athlete.bodyWeight}
+                      onChange={(value) => updateAthlete(athlete.id, 'bodyWeight', value)}
+                      placeholder="Например: 82.5"
+                      inputMode="decimal"
+                    />
                   </div>
 
                   <div className={styles.attemptsGrid}>
-                    <label>
-                      Попытка 1 (кг)
-                      <input
-                        type="text"
-                        inputMode="decimal"
-                        value={athlete.attempts[0]}
-                        onChange={(event) =>
-                          updateAthlete(athlete.id, 'attempts', [
-                            event.target.value,
-                            athlete.attempts[1],
-                            athlete.attempts[2],
-                          ])
-                        }
-                        placeholder="Например: 70"
-                      />
-                    </label>
+                    <InputField
+                      label="Попытка 1 (кг)"
+                      value={athlete.attempts[0]}
+                      onChange={(value) =>
+                        updateAthlete(athlete.id, 'attempts', [
+                          value,
+                          athlete.attempts[1],
+                          athlete.attempts[2],
+                        ])
+                      }
+                      placeholder="Например: 70"
+                      inputMode="decimal"
+                    />
 
-                    <label>
-                      Попытка 2 (кг)
-                      <input
-                        type="text"
-                        inputMode="decimal"
-                        value={athlete.attempts[1]}
-                        onChange={(event) =>
-                          updateAthlete(athlete.id, 'attempts', [
-                            athlete.attempts[0],
-                            event.target.value,
-                            athlete.attempts[2],
-                          ])
-                        }
-                        placeholder="Например: 72.5"
-                      />
-                    </label>
+                    <InputField
+                      label="Попытка 2 (кг)"
+                      value={athlete.attempts[1]}
+                      onChange={(value) =>
+                        updateAthlete(athlete.id, 'attempts', [
+                          athlete.attempts[0],
+                          value,
+                          athlete.attempts[2],
+                        ])
+                      }
+                      placeholder="Например: 72.5"
+                      inputMode="decimal"
+                    />
 
-                    <label>
-                      Попытка 3 (кг)
-                      <input
-                        type="text"
-                        inputMode="decimal"
-                        value={athlete.attempts[2]}
-                        onChange={(event) =>
-                          updateAthlete(athlete.id, 'attempts', [
-                            athlete.attempts[0],
-                            athlete.attempts[1],
-                            event.target.value,
-                          ])
-                        }
-                        placeholder="Например: 75"
-                      />
-                    </label>
+                    <InputField
+                      label="Попытка 3 (кг)"
+                      value={athlete.attempts[2]}
+                      onChange={(value) =>
+                        updateAthlete(athlete.id, 'attempts', [
+                          athlete.attempts[0],
+                          athlete.attempts[1],
+                          value,
+                        ])
+                      }
+                      placeholder="Например: 75"
+                      inputMode="decimal"
+                    />
                   </div>
                 </>
               )}
             </article>
           ))}
 
-          <button type="button" className={styles.addButton} onClick={addAthlete}>
+          <Button variant="primary" onClick={addAthlete} className={styles.addButton}>
             + Добавить спортсмена
-          </button>
+          </Button>
         </section>
 
-        <section className={styles.resultSection}>
-          <h2>Рейтинг по формуле {FORMULA_LABELS[formula]}</h2>
-          <div className={styles.tableWrapper}>
-            <table>
-              <thead>
-                <tr>
-                  <th>Место</th>
-                  <th>Спортсмен</th>
-                  <th>Пол</th>
-                  <th>Собственный вес</th>
-                  <th>Лучшая попытка</th>
-                  <th>Коэффициент</th>
-                  <th>Итог</th>
-                </tr>
-              </thead>
-              <tbody>
-                {calculatedAthletes.map((athlete, index) => (
-                  <tr key={athlete.id} className={athlete.id === leaderId ? styles.leaderRow : ''}>
-                    <td>{index + 1}</td>
-                    <td>{athlete.name || 'Без имени'}</td>
-                    <td>
-                      {athlete.gender === 'male' ? 'М' : athlete.gender === 'female' ? 'Ж' : '—'}
-                    </td>
-                    <td>{athlete.bodyWeight || '—'}</td>
-                    <td>{athlete.bestAttempt !== null ? athlete.bestAttempt.toFixed(2) : '—'}</td>
-                    <td>{athlete.coefficient !== null ? athlete.coefficient.toFixed(3) : '—'}</td>
-                    <td>{athlete.score !== null ? athlete.score.toFixed(2) : '—'}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </section>
+        <CoefficientsTable
+          athletes={calculatedAthletes}
+          leaderId={leaderId}
+          formulaLabel={FORMULA_LABELS[formula]}
+        />
       </main>
     </div>
   );

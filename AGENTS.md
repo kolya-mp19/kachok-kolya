@@ -22,6 +22,10 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 ## Coding Rules
 
+- All folder names must be lowercase. Multi-word folder names use kebab-case (words separated by hyphens).
+  Examples: `athlete-card/`, `form-fields/`, `use-athletes/`
+  Wrong: `AthleteCard/`, `athleteCard/`, `FormFields/`, `form_fields/`
+  This rule applies to every folder in the project without exception, including inside `src/`, `public/`, and any future directories.
 - Prefer focused, minimal edits over large refactors.
 - Keep business logic in small typed helper functions.
 - Avoid `any`; keep strict TypeScript-friendly updates.
