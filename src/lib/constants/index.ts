@@ -1,1 +1,1 @@
-export { FORMULA_LABELS } from './formula-labels';
+export { FORMULA_LABELS, FORMULA_OPTIONS } from './formula-labels';

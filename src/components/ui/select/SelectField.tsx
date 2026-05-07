@@ -1,6 +1,6 @@
 import styles from './SelectField.module.css';
 
-type SelectOption = {
+export type SelectOption = {
   value: string;
   label: string;
   disabled?: boolean;

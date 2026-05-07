@@ -1,0 +1,44 @@
+.athleteCard {
+  border: 1px solid #d6deec;
+  border-radius: 12px;
+  padding: 14px;
+  background-color: #f8fbff;
+  display: grid;
+  gap: 12px;
+}
+
+.cardTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.cardTop h2 {
+  font-size: 18px;
+  color: #1f2937;
+}
+
+.cardActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.fieldsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 10px;
+}
+
+.attemptsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+@media (max-width: 768px) {
+  .attemptsGrid {
+    grid-template-columns: 1fr;
+  }
+}

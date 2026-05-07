@@ -1,13 +1,13 @@
 'use client';
 
 import { useState } from 'react';
-import type { GenderValue, FormulaType } from '../types';
+import type { FormulaType } from '../types';
 import Button from '../components/ui/button/Button';
 import CoefficientsTable from '../components/table/coefficients-table/CoefficientsTable';
-import InputField from '../components/ui/input/InputField';
 import SelectField from '../components/ui/select/SelectField';
-import { FORMULA_LABELS } from '../lib/constants';
+import { FORMULA_LABELS, FORMULA_OPTIONS } from '../lib/constants';
 import { useAthletes, useCalculatedAthletes } from '../hooks';
+import AthleteCard from '../components/athlete/AthleteCard';
 import styles from './page.module.css';
 
 export default function Home() {
@@ -34,109 +34,20 @@ export default function Home() {
               label="Формула расчета"
               value={formula}
               onChange={(value) => setFormula(value as FormulaType)}
-              options={[
-                { value: 'wilks', label: 'Уилкс' },
-                { value: 'ipfGl', label: 'IPF GL Points' },
-                { value: 'dots', label: 'DOTS' },
-                { value: 'schwartzMalone', label: 'Schwartz/Malone' },
-              ]}
+              options={FORMULA_OPTIONS}
             />
           </div>
 
           {athletes.map((athlete, index) => (
-            <article key={athlete.id} className={styles.athleteCard}>
-              <div className={styles.cardTop}>
-                <h2>{athlete.name || `Атлет ${index + 1}`}</h2>
-                <div className={styles.cardActions}>
-                  <Button variant="ghost" onClick={() => toggleAthleteCollapse(athlete.id)}>
-                    {athlete.collapsed ? 'Развернуть' : 'Свернуть'}
-                  </Button>
-                  {athletes.length > 1 && (
-                    <Button variant="danger" onClick={() => removeAthlete(athlete.id)}>
-                      Удалить
-                    </Button>
-                  )}
-                </div>
-              </div>
-
-              {!athlete.collapsed && (
-                <>
-                  <div className={styles.fieldsGrid}>
-                    <InputField
-                      label="Имя"
-                      value={athlete.name}
-                      onChange={(value) => updateAthlete(athlete.id, 'name', value)}
-                      placeholder="Например: Иван"
-                    />
-
-                    <SelectField
-                      label="Пол"
-                      value={athlete.gender}
-                      onChange={(value) =>
-                        updateAthlete(athlete.id, 'gender', value as GenderValue)
-                      }
-                      options={[
-                        { value: '', label: 'Выберите пол', disabled: true },
-                        { value: 'male', label: 'Мужской' },
-                        { value: 'female', label: 'Женский' },
-                      ]}
-                    />
-
-                    <InputField
-                      label="Собственный вес (кг)"
-                      value={athlete.bodyWeight}
-                      onChange={(value) => updateAthlete(athlete.id, 'bodyWeight', value)}
-                      placeholder="Например: 82.5"
-                      inputMode="decimal"
-                    />
-                  </div>
-
-                  <div className={styles.attemptsGrid}>
-                    <InputField
-                      label="Попытка 1 (кг)"
-                      value={athlete.attempts[0]}
-                      onChange={(value) =>
-                        updateAthlete(athlete.id, 'attempts', [
-                          value,
-                          athlete.attempts[1],
-                          athlete.attempts[2],
-                        ])
-                      }
-                      placeholder="Например: 70"
-                      inputMode="decimal"
-                    />
-
-                    <InputField
-                      label="Попытка 2 (кг)"
-                      value={athlete.attempts[1]}
-                      onChange={(value) =>
-                        updateAthlete(athlete.id, 'attempts', [
-                          athlete.attempts[0],
-                          value,
-                          athlete.attempts[2],
-                        ])
-                      }
-                      placeholder="Например: 72.5"
-                      inputMode="decimal"
-                    />
-
-                    <InputField
-                      label="Попытка 3 (кг)"
-                      value={athlete.attempts[2]}
-                      onChange={(value) =>
-                        updateAthlete(athlete.id, 'attempts', [
-                          athlete.attempts[0],
-                          athlete.attempts[1],
-                          value,
-                        ])
-                      }
-                      placeholder="Например: 75"
-                      inputMode="decimal"
-                    />
-                  </div>
-                </>
-              )}
-            </article>
+            <AthleteCard
+              key={athlete.id}
+              athlete={athlete}
+              index={index}
+              onToggleCollapse={toggleAthleteCollapse}
+              onRemove={removeAthlete}
+              onUpdate={updateAthlete}
+              showRemove={athletes.length > 1}
+            />
           ))}
 
           <Button variant="primary" onClick={addAthlete} className={styles.addButton}>
