@@ -27,6 +27,8 @@
 - PostgreSQL 17 в Docker: production (`docker-compose.yml`) + локальная разработка (`src/env/local/docker-compose.yml`)
 - `.env.example` с документацией всех переменных
 - Разделённые bind-mount тома (`.docker/postgres-data/`, `src/env/local/postgres-data/`)
+- Drizzle ORM + drizzle-kit: схема в `src/db/schema/`, миграции в `src/db/migrations/`
+- Схема на данный момент: только таблица `users` + enum `gender`; остальные таблицы будут добавлены по мере роста фич
 
 ---
 
@@ -42,7 +44,7 @@
 | Линтер | ESLint 9 flat config + @typescript-eslint | Современный конфиг, совместим с TS |
 | Форматирование | Prettier 3 | Единый стиль кода |
 | База данных | PostgreSQL 17 (Alpine) | Надёжная, хорошо поддерживается ORM, совместима с Docker |
-| ORM | **NOT YET DECIDED** (предпочтение: Prisma) | — |
+| ORM | Drizzle ORM 0.45 + drizzle-kit 0.31, `postgres` драйвер | Лёгкий, type-safe, SQL-first, хорошо работает с App Router |
 | Аутентификация | **NOT YET DECIDED** (Clerk или Auth.js) | — |
 | Контейнеризация | Docker + Compose (multi-stage, node:20-alpine) | Лёгкий образ, безопасный non-root запуск, совместим с VPS nginx |
 | MCP-сервер | **NOT YET DECIDED** (планируется в v2) | — |
@@ -54,7 +56,8 @@
 ### Инфраструктура
 - [x] Контейнеризировать приложение (Dockerfile + docker-compose)
 - [x] Поднять PostgreSQL в Docker (production + local dev compose-файлы)
-- [ ] Выбрать и подключить ORM (NOT YET DECIDED: предпочтение Prisma)
+- [x] Выбрать и подключить ORM (Drizzle ORM + drizzle-kit + postgres driver)
+- [x] Автоматический запуск миграций при старте контейнера (scripts/start.sh)
 - [ ] Выбрать стратегию аутентификации (NOT YET DECIDED: Clerk или Auth.js)
 
 ### v1 — MVP
@@ -81,30 +84,43 @@
 
 ## Выполнено в последней сессии
 
-**Задача:** PostgreSQL в Docker — **ВЫПОЛНЕНО**
+**Задача:** Автозапуск миграций в Docker — **ВЫПОЛНЕНО**
 
 Создано/изменено:
-- `docker-compose.yml` — активирован `postgres:17-alpine` с healthcheck; `app` стартует только после `service_healthy`; bind-mount `.docker/postgres-data/`
-- `src/env/local/docker-compose.yml` — только PostgreSQL для локальной разработки вне Docker; bind-mount `src/env/local/postgres-data/`
-- `.env.example` — шаблон с `POSTGRES_*` и `DATABASE_URL`, документирует разницу local/production
-- `.gitignore` — добавлены `.docker/`, `src/env/local/postgres-data/`, `!.env.example`
-- `.dockerignore` — добавлены `src/env/`, `.docker/`
-- `README.md` — разделы «База данных», «Резервное копирование», «Troubleshooting», обновлён «Быстрый старт»
-- `AGENTS.md` — обновлён раздел инфраструктуры: local vs production workflow
+- `scripts/start.sh` — запускает `npm run db:migrate`, затем `exec node server.js`; `set -e` гарантирует остановку контейнера при ошибке миграции
+- `next.config.ts` — добавлен `output: 'standalone'`; генерирует `server.js` для запуска без `next` CLI
+- `Dockerfile` runner-стейдж — переведён на standalone-output: копирует `.next/standalone/`, `.next/static`, `public/`, полный `node_modules` из builder (включая `drizzle-kit`), `src/db/migrations/`, `drizzle.config.ts`, `scripts/`; CMD заменён на `["scripts/start.sh"]`
+
+---
+
+**Задача:** Drizzle ORM — **ВЫПОЛНЕНО**
+
+Создано/изменено:
+- `drizzle.config.ts` — конфиг drizzle-kit: dialect postgresql, schema `src/db/schema/index.ts`, out `src/db/migrations/`
+- `src/db/index.ts` — singleton drizzle-клиент на `postgres` драйвере, global-паттерн против утечек при hot reload
+- `src/db/schema/users.ts` — таблица `users`, enum `gender`
+- `src/db/schema/workouts.ts` — таблицы `workout_sessions` (enum `workout_type`), `exercises`, `session_sets`
+- `src/db/schema/body.ts` — таблица `body_weight_logs`
+- `src/db/schema/index.ts` — re-export всех схем
+- `src/db/migrations/0000_skinny_wonder_man.sql` — первая миграция, применена локально
+- `package.json` — добавлены скрипты `db:generate`, `db:migrate`, `db:studio`, `db:push`
+- `.env` — исправлен `POSTGRES_HOST` и `DATABASE_URL` на `localhost` для локальной разработки
 
 ---
 
 ## Следующий шаг
 
-**Задача:** Выбрать и подключить ORM.
+**Задача:** Добавить аутентификацию через Clerk.
+
+> Инфраструктура готова: БД поднята, миграции применяются автоматически, Next.js запускается через standalone-образ.
 
 **Что значит «готово»:**
-- Выбрана ORM (предпочтение: Prisma)
-- Установлены зависимости (`prisma`, `@prisma/client`)
-- `prisma/schema.prisma` создан с подключением к PostgreSQL
-- Первая миграция (`prisma migrate dev`) применена локально
-- `DATABASE_URL` читается из `process.env` в коде приложения
-- `prisma generate` добавлен в `postinstall` скрипт `package.json`
+- Установлен `@clerk/nextjs`
+- `CLERK_SECRET_KEY` и `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` добавлены в `.env.example` и `.env`
+- `middleware.ts` настроен для защиты роутов
+- `ClerkProvider` обёрнут вокруг layout
+- Страницы `/sign-in` и `/sign-up` работают
+- `userId` из Clerk используется как FK в таблице `users` (или через отдельный маппинг)
 
 **Масштабирование и будущие сервисы:**
 - Redis — раскомментировать блок в `docker-compose.yml`, добавить `REDIS_URL` в `.env.example`
