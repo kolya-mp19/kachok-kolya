@@ -8,7 +8,11 @@
       "Bash(Remove-Item \"d:\\\\projects\\\\kachok-kolya\\\\src\\\\types\\\\.gitkeep\")",
       "Bash(Remove-Item \"d:\\\\projects\\\\kachok-kolya\\\\src\\\\lib\\\\utils\\\\.gitkeep\" -Force)",
       "Bash(Remove-Item \"d:\\\\projects\\\\kachok-kolya\\\\src\\\\lib\\\\constants\\\\.gitkeep\" -Force)",
-      "Bash(Remove-Item \"d:\\\\projects\\\\kachok-kolya\\\\src\\\\components\\\\athlete\\\\.gitkeep\")"
+      "Bash(Remove-Item \"d:\\\\projects\\\\kachok-kolya\\\\src\\\\components\\\\athlete\\\\.gitkeep\")",
+      "PowerShell(Get-ChildItem -Path \"d:\\\\projects\\\\kachok-kolya\\\\src\" -Force | Select-Object Name, @{Name=\"Type\";Expression={if\\($_.PSIsContainer\\){\"Dir\"}else{\"File\"}}} | Format-Table -AutoSize)",
+      "PowerShell(Get-ChildItem -Path \"d:\\\\projects\\\\kachok-kolya\\\\src\\\\app\" -Force | Select-Object Name, @{Name=\"Type\";Expression={if\\($_.PSIsContainer\\){\"Dir\"}else{\"File\"}}} | Format-Table -AutoSize)",
+      "PowerShell(Get-ChildItem -Path \"d:\\\\projects\\\\kachok-kolya\\\\src\\\\components\" -Force | Select-Object Name, @{Name=\"Type\";Expression={if\\($_.PSIsContainer\\){\"Dir\"}else{\"File\"}}} | Format-Table -AutoSize)",
+      "PowerShell(Get-ChildItem -Path \"d:\\\\projects\\\\kachok-kolya\\\\src\\\\lib\" -Force | Select-Object Name, @{Name=\"Type\";Expression={if\\($_.PSIsContainer\\){\"Dir\"}else{\"File\"}}} | Format-Table -AutoSize)"
     ]
   }
 }

@@ -1,36 +1,107 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# КачОК — Аналитика силовых тренировок
 
-## Getting Started
+Веб-приложение для атлетов, тренеров и организаторов соревнований по пауэрлифтингу.  
+Позволяет сравнивать спортсменов разных весовых категорий через коэффициенты относительной силы,
+а в будущем — вести дневник тренировок, анализировать прогресс и планировать нагрузку с помощью ИИ.
 
-First, run the development server:
+---
+
+## Возможности (текущая версия)
+
+- **Калькулятор коэффициентов**: Wilks, IPF GL Points, DOTS, Schwartz/Malone
+- **Несколько атлетов**: добавляйте любое количество участников в одну сессию
+- **Ввод данных**: собственный вес, пол, три попытки в каждом упражнении
+- **Сводная таблица**: результаты автоматически сортируются по лучшему коэффициенту
+
+---
+
+## Дорожная карта
+
+### v1 — MVP (дневник и статистика)
+- Журнал тренировок с историей
+- Личный кабинет пользователя
+- Базовая статистика: объём нагрузки (тоннаж), регулярность
+
+### v2 — AI-аналитика
+- MCP-сервер для интеграции с ИИ
+- Чат с Claude: анализ тренировок, советы по прогрессии
+- Цели пользователя: похудение / набор массы / развитие силы
+
+### v3 — Планирование
+- Генерация тренировочных планов
+- Автоматическая прогрессия рабочих весов
+- Трекер восстановления: сон, RPE
+
+### v4 — Питание
+- Дневник питания и КБЖУ
+- Расчёт макросов под цель
+- ИИ-анализ питания в связке с тренировочными данными
+
+---
+
+## Технологии
+
+| Слой | Технология |
+|---|---|
+| Фреймворк | Next.js 16 (App Router) |
+| UI | React 19 |
+| Язык | TypeScript 5 |
+| Стили | CSS Modules |
+| Линтер | ESLint 9 + @typescript-eslint |
+| Форматирование | Prettier 3 |
+| Утилиты | nanoid |
+
+---
+
+## Быстрый старт
 
 ```bash
+# 1. Клонировать репозиторий
+git clone <repo-url>
+cd kachok-kolya
+
+# 2. Установить зависимости
+npm install
+
+# 3. Запустить dev-сервер
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Приложение будет доступно по адресу [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Доступные команды
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run dev          # dev-сервер с hot reload
+npm run build        # production-сборка
+npm run start        # запуск production-сервера
+npm run lint         # проверка линтером
+npm run lint:fix     # автоисправление ошибок линтера
+npm run format       # форматирование кода Prettier
+npm run format:check # проверка форматирования
+```
 
-## Learn More
+### Переменные окружения
 
-To learn more about Next.js, take a look at the following resources:
+На текущем этапе переменные окружения не требуются. По мере добавления БД и аутентификации
+появится файл `.env.example` с описанием необходимых переменных.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Структура проекта
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```
+src/
+├── app/               # Next.js App Router: страницы и layout
+├── components/
+│   ├── athlete/       # Карточка атлета (ввод данных)
+│   ├── table/         # Сводная таблица коэффициентов
+│   └── ui/            # Переиспользуемые UI-компоненты (Button, Input, Select, Table)
+├── hooks/             # React-хуки: управление атлетами и расчёт результатов
+├── lib/
+│   ├── calculations/  # Формулы: Wilks, IPF GL, DOTS, Schwartz/Malone
+│   ├── constants/     # Константы и метки формул
+│   └── utils/         # Вспомогательные функции (парсинг чисел и др.)
+├── schemas/           # Схемы валидации (Zod — планируется)
+└── types/             # TypeScript-типы: Athlete, Formula и др.
+```
