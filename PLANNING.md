@@ -40,7 +40,7 @@
 | База данных | **NOT YET DECIDED** (предпочтение: PostgreSQL) | — |
 | ORM | **NOT YET DECIDED** (Prisma или Drizzle) | — |
 | Аутентификация | **NOT YET DECIDED** (Clerk или Auth.js) | — |
-| Контейнеризация | **NOT YET DECIDED** (Docker — следующий шаг) | — |
+| Контейнеризация | Docker + Compose (multi-stage, node:20-alpine) | Лёгкий образ, безопасный non-root запуск, совместим с VPS nginx |
 | MCP-сервер | **NOT YET DECIDED** (планируется в v2) | — |
 
 ---
@@ -48,7 +48,7 @@
 ## Дорожная карта
 
 ### Инфраструктура
-- [ ] Контейнеризировать приложение (Dockerfile + docker-compose)
+- [x] Контейнеризировать приложение (Dockerfile + docker-compose)
 - [ ] Выбрать и подключить базу данных (NOT YET DECIDED: PostgreSQL preferred)
 - [ ] Выбрать и подключить ORM (NOT YET DECIDED: Prisma или Drizzle)
 - [ ] Выбрать стратегию аутентификации (NOT YET DECIDED: Clerk или Auth.js)
@@ -75,15 +75,29 @@
 
 ---
 
+## Выполнено в последней сессии
+
+**Задача:** Контейнеризация приложения — **ВЫПОЛНЕНО**
+
+Созданы:
+- `Dockerfile` — 3-stage сборка (deps → builder → runner), образ `node:20-alpine`, non-root user
+- `.dockerignore` — исключены `node_modules`, `.next`, `.env*`, `.git`, документация
+- `docker-compose.yml` — сервис `app`, порт `127.0.0.1:3000:3000`, заготовки для PostgreSQL / Redis / worker
+- README.md обновлён: разделы «Запуск через Docker» и «Деплой на VPS»
+- AGENTS.md обновлён: раздел инфраструктуры и деплоя
+
+---
+
 ## Следующий шаг
 
-**Задача:** Контейнеризировать приложение с Docker и docker-compose.
+**Задача:** Выбрать и подключить базу данных.
 
 **Что значит «готово»:**
-- `Dockerfile` — multi-stage сборка (build + production-образ на node:alpine)
-- `docker-compose.yml` — сервис `app`, маппинг порта 3000, поддержка `.env`
-- Приложение запускается командой `docker-compose up` без дополнительных шагов
-- В README добавлен раздел «Запуск через Docker» с командами
+- Выбрана СУБД (предпочтение: PostgreSQL 16)
+- Выбрана ORM (предпочтение: Prisma или Drizzle)
+- `postgres` сервис раскомментирован в `docker-compose.yml`
+- Добавлен `.env.example` с `DATABASE_URL`
+- Первая миграция создана и применена
 
 ---
 

@@ -85,8 +85,73 @@ This version has breaking changes — APIs, conventions, and file structure may 
   - `style: ...` for visual-only changes
 - Keep subject line in imperative mood and under ~72 chars when possible.
 
+## Docker & Infrastructure
+
+### Container architecture
+
+The application is containerized with a 3-stage Dockerfile:
+
+| Stage | Base | Purpose |
+|---|---|---|
+| `deps` | node:20-alpine | Install production `node_modules` only |
+| `builder` | node:20-alpine | Install all deps, run `npm run build` |
+| `runner` | node:20-alpine | Copy artifacts, run as non-root `nextjs` user |
+
+The final image contains only production dependencies and the `.next` build output.
+No source files, no dev dependencies, no secrets.
+
+### Port binding
+
+`docker-compose.yml` binds the app port to `127.0.0.1:3000:3000` (localhost-only).
+nginx on the VPS proxies `kachok-kolya.duckdns.org → http://127.0.0.1:3000`.
+**Never** change the binding to `0.0.0.0:3000:3000` on production — that would
+expose Node.js directly to the internet, bypassing nginx.
+
+### Deployment workflow
+
+```bash
+# First deploy or after infrastructure changes
+git pull && docker compose up --build -d
+
+# Code-only update (no dependency or config changes)
+git pull && docker compose up --build -d
+
+# Check running containers
+docker compose ps
+
+# Stream application logs
+docker compose logs -f app
+
+# Rollback: restart the previous image (if not yet pruned)
+docker compose restart app
+```
+
+### Adding future services
+
+`docker-compose.yml` contains commented-out blocks for:
+- **PostgreSQL** — uncomment `postgres` service and `postgres_data` volume
+- **Redis** — uncomment `redis` service and `redis_data` volume
+- **Background worker** — uncomment `worker` service; create `Dockerfile.worker`
+
+Steps to activate a service:
+1. Uncomment the block in `docker-compose.yml`.
+2. Add required env vars to `.env` (and document them in `.env.example`).
+3. Uncomment `depends_on` in the `app` service.
+4. Uncomment the named volume at the bottom of the file.
+5. Run `docker compose up -d --build`.
+
+### Infrastructure rules for AI agents
+
+- Always keep `README.md`, `PLANNING.md`, and `AGENTS.md` in sync with infra changes.
+- Never commit `.env` files; only commit `.env.example` with placeholder values.
+- When adding a new service, document it in both `docker-compose.yml` (inline comments)
+  and this file.
+- Use `127.0.0.1` bindings for all ports on production VPS.
+- After every infrastructure change, update the **Следующий шаг** section in `PLANNING.md`.
+
 ## Delivery Checklist
 
 - Run lint diagnostics for changed files after substantive edits.
 - Preserve existing features unless explicitly asked to remove them.
 - Keep UI state durable (e.g., collapse toggles should not clear form data).
+- After infrastructure changes: update `README.md`, `PLANNING.md`, and `AGENTS.md`.

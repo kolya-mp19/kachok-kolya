@@ -50,6 +50,7 @@
 | Линтер | ESLint 9 + @typescript-eslint |
 | Форматирование | Prettier 3 |
 | Утилиты | nanoid |
+| Контейнеризация | Docker + Compose |
 
 ---
 
@@ -85,6 +86,57 @@ npm run format:check # проверка форматирования
 
 На текущем этапе переменные окружения не требуются. По мере добавления БД и аутентификации
 появится файл `.env.example` с описанием необходимых переменных.
+
+---
+
+## Запуск через Docker
+
+### Локальная разработка / проверка production-образа
+
+```bash
+# Собрать образ и запустить контейнер
+docker compose up --build
+
+# В фоновом режиме
+docker compose up --build -d
+
+# Остановить
+docker compose down
+```
+
+Приложение будет доступно по адресу [http://localhost:3000](http://localhost:3000).
+
+### Деплой на VPS
+
+```bash
+# 1. Подключиться к серверу
+ssh user@kachok-kolya.duckdns.org
+
+# 2. Перейти в директорию проекта
+cd /path/to/kachok-kolya
+
+# 3. Получить последние изменения
+git pull
+
+# 4. Пересобрать и перезапустить контейнер без простоя
+docker compose up --build -d
+
+# 5. Проверить статус
+docker compose ps
+docker compose logs app --tail=50
+```
+
+Nginx на VPS уже настроен проксировать `kachok-kolya.duckdns.org → http://127.0.0.1:3000`.
+Порт контейнера намеренно привязан к `127.0.0.1`, поэтому прямой доступ к Node.js снаружи закрыт.
+
+### Полезные Docker-команды
+
+```bash
+docker compose logs -f app         # потоковые логи
+docker compose exec app sh         # зайти в контейнер
+docker compose restart app         # перезапустить без сборки
+docker image prune -f              # удалить устаревшие образы
+```
 
 ---
 
