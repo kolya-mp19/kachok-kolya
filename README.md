@@ -50,6 +50,7 @@
 | Линтер | ESLint 9 + @typescript-eslint |
 | Форматирование | Prettier 3 |
 | Утилиты | nanoid |
+| База данных | PostgreSQL 17 |
 | Контейнеризация | Docker + Compose |
 
 ---
@@ -64,7 +65,15 @@ cd kachok-kolya
 # 2. Установить зависимости
 npm install
 
-# 3. Запустить dev-сервер
+# 3. Создать файл переменных окружения для локальной разработки
+cp .env.example .env.local
+# Отредактируй .env.local: поменяй POSTGRES_HOST на localhost
+# и DATABASE_URL на postgresql://kachok:kachok_dev@localhost:5432/kachok
+
+# 4. Запустить локальную базу данных
+docker compose -f src/env/local/docker-compose.yml up -d
+
+# 5. Запустить dev-сервер
 npm run dev
 ```
 
@@ -84,27 +93,105 @@ npm run format:check # проверка форматирования
 
 ### Переменные окружения
 
-На текущем этапе переменные окружения не требуются. По мере добавления БД и аутентификации
-появится файл `.env.example` с описанием необходимых переменных.
+Шаблон находится в [`.env.example`](.env.example). Скопируй его и заполни реальными значениями:
+
+| Переменная | Описание | Пример (локально) |
+|---|---|---|
+| `POSTGRES_HOST` | Хост БД | `localhost` (локально) / `postgres` (Docker) |
+| `POSTGRES_PORT` | Порт PostgreSQL | `5432` |
+| `POSTGRES_USER` | Пользователь БД | `kachok` |
+| `POSTGRES_PASSWORD` | Пароль БД | `kachok_dev` |
+| `POSTGRES_DB` | Имя базы данных | `kachok` |
+| `DATABASE_URL` | Полная строка подключения для ORM | `postgresql://kachok:kachok_dev@localhost:5432/kachok` |
+
+**Для локальной разработки** — создай `.env.local` (Next.js загружает его автоматически):
+
+```bash
+cp .env.example .env.local
+# Измени POSTGRES_HOST=localhost и DATABASE_URL соответственно
+```
+
+**Для production** — создай `.env` на VPS (загружается через `env_file` в `docker-compose.yml`):
+
+```bash
+cp .env.example .env
+# Установи надёжный пароль и правильный DATABASE_URL с хостом postgres
+```
+
+---
+
+## База данных (PostgreSQL)
+
+Проект использует **PostgreSQL 17**. Конфигурация разделена на два окружения:
+
+| Окружение | Compose-файл | Запуск Next.js |
+|---|---|---|
+| Локальная разработка | `src/env/local/docker-compose.yml` | `npm run dev` (вне Docker) |
+| Production (VPS) | `docker-compose.yml` (корень) | в Docker-контейнере |
+
+### Локальная разработка с БД
+
+```bash
+# Запустить только PostgreSQL в Docker
+docker compose -f src/env/local/docker-compose.yml up -d
+
+# Подключиться к БД из консоли
+docker compose -f src/env/local/docker-compose.yml exec postgres \
+  psql -U kachok -d kachok
+
+# Остановить (данные сохраняются в src/env/local/postgres-data/)
+docker compose -f src/env/local/docker-compose.yml down
+
+# Полный сброс с удалением данных
+docker compose -f src/env/local/docker-compose.yml down -v
+rm -rf src/env/local/postgres-data/
+```
+
+Данные хранятся в `src/env/local/postgres-data/` — директория создаётся автоматически и **не коммитится**.
+
+### Данные и тома (Volumes)
+
+| Окружение | Путь на хосте | Статус |
+|---|---|---|
+| Локальная разработка | `src/env/local/postgres-data/` | gitignored, создаётся автоматически |
+| Production (VPS) | `.docker/postgres-data/` | gitignored, создаётся автоматически |
+
+> **Важно:** Никогда не удаляй `.docker/postgres-data/` на VPS без предварительного бэкапа.
+
+### Резервное копирование (Backup)
+
+```bash
+# На VPS: создать дамп базы данных
+docker compose exec postgres \
+  pg_dump -U kachok -d kachok --format=custom > backup_$(date +%Y%m%d_%H%M%S).dump
+
+# Восстановить из дампа
+docker compose exec -T postgres \
+  pg_restore -U kachok -d kachok --clean < backup_YYYYMMDD_HHMMSS.dump
+```
+
+Рекомендуется настроить ежедневный cron-бэкап на VPS и хранить дампы в отдельной директории или S3.
 
 ---
 
 ## Запуск через Docker
 
-### Локальная разработка / проверка production-образа
+### Production-стек (app + PostgreSQL)
 
 ```bash
-# Собрать образ и запустить контейнер
-docker compose up --build
+# Убедись, что .env создан из .env.example с реальными значениями
+cp .env.example .env && nano .env
 
-# В фоновом режиме
+# Запустить весь стек (PostgreSQL → Next.js)
 docker compose up --build -d
 
-# Остановить
-docker compose down
-```
+# Проверить статус
+docker compose ps
 
-Приложение будет доступно по адресу [http://localhost:3000](http://localhost:3000).
+# Логи
+docker compose logs -f app
+docker compose logs -f postgres
+```
 
 ### Деплой на VPS
 
@@ -118,24 +205,62 @@ cd /path/to/kachok-kolya
 # 3. Получить последние изменения
 git pull
 
-# 4. Пересобрать и перезапустить контейнер без простоя
+# 4. Пересобрать и перезапустить (PostgreSQL не пересоздаётся — данные сохраняются)
 docker compose up --build -d
 
-# 5. Проверить статус
+# 5. Проверить, что всё запустилось
 docker compose ps
 docker compose logs app --tail=50
 ```
 
 Nginx на VPS уже настроен проксировать `kachok-kolya.duckdns.org → http://127.0.0.1:3000`.
-Порт контейнера намеренно привязан к `127.0.0.1`, поэтому прямой доступ к Node.js снаружи закрыт.
+Порт контейнера намеренно привязан к `127.0.0.1` — прямой доступ к Node.js снаружи закрыт.
 
 ### Полезные Docker-команды
 
 ```bash
-docker compose logs -f app         # потоковые логи
-docker compose exec app sh         # зайти в контейнер
-docker compose restart app         # перезапустить без сборки
-docker image prune -f              # удалить устаревшие образы
+docker compose logs -f app              # потоковые логи приложения
+docker compose logs -f postgres         # потоковые логи БД
+docker compose exec app sh              # shell в контейнере приложения
+docker compose exec postgres psql -U kachok -d kachok  # psql в контейнере БД
+docker compose restart app             # перезапустить приложение без сборки
+docker image prune -f                  # удалить устаревшие образы
+```
+
+---
+
+## Troubleshooting
+
+**Приложение не запускается, ошибка подключения к БД**
+
+```bash
+# Проверить статус и healthcheck postgres
+docker compose ps
+docker compose logs postgres --tail=30
+```
+
+**PostgreSQL не проходит healthcheck**
+
+```bash
+# Зайти в контейнер и проверить вручную
+docker compose exec postgres pg_isready -U kachok -d kachok
+```
+
+**Порт 5432 уже занят на хосте**
+
+```bash
+# Найти процесс
+sudo lsof -i :5432
+# или
+sudo ss -tlnp | grep 5432
+```
+
+**Сбросить все данные локальной БД**
+
+```bash
+docker compose -f src/env/local/docker-compose.yml down
+rm -rf src/env/local/postgres-data/
+docker compose -f src/env/local/docker-compose.yml up -d
 ```
 
 ---

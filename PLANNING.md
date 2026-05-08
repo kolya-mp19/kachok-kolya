@@ -23,6 +23,10 @@
 - Переиспользуемые UI-компоненты: Button, Input, Select, Table
 - Типизация через TypeScript-интерфейсы (Athlete, Formula)
 - Настроены ESLint (flat config, @typescript-eslint) и Prettier
+- Docker + Compose (multi-stage build, non-root runner)
+- PostgreSQL 17 в Docker: production (`docker-compose.yml`) + локальная разработка (`src/env/local/docker-compose.yml`)
+- `.env.example` с документацией всех переменных
+- Разделённые bind-mount тома (`.docker/postgres-data/`, `src/env/local/postgres-data/`)
 
 ---
 
@@ -37,8 +41,8 @@
 | ID генерация | nanoid | Лёгкая замена uuid, уже в проекте |
 | Линтер | ESLint 9 flat config + @typescript-eslint | Современный конфиг, совместим с TS |
 | Форматирование | Prettier 3 | Единый стиль кода |
-| База данных | **NOT YET DECIDED** (предпочтение: PostgreSQL) | — |
-| ORM | **NOT YET DECIDED** (Prisma или Drizzle) | — |
+| База данных | PostgreSQL 17 (Alpine) | Надёжная, хорошо поддерживается ORM, совместима с Docker |
+| ORM | **NOT YET DECIDED** (предпочтение: Prisma) | — |
 | Аутентификация | **NOT YET DECIDED** (Clerk или Auth.js) | — |
 | Контейнеризация | Docker + Compose (multi-stage, node:20-alpine) | Лёгкий образ, безопасный non-root запуск, совместим с VPS nginx |
 | MCP-сервер | **NOT YET DECIDED** (планируется в v2) | — |
@@ -49,8 +53,8 @@
 
 ### Инфраструктура
 - [x] Контейнеризировать приложение (Dockerfile + docker-compose)
-- [ ] Выбрать и подключить базу данных (NOT YET DECIDED: PostgreSQL preferred)
-- [ ] Выбрать и подключить ORM (NOT YET DECIDED: Prisma или Drizzle)
+- [x] Поднять PostgreSQL в Docker (production + local dev compose-файлы)
+- [ ] Выбрать и подключить ORM (NOT YET DECIDED: предпочтение Prisma)
 - [ ] Выбрать стратегию аутентификации (NOT YET DECIDED: Clerk или Auth.js)
 
 ### v1 — MVP
@@ -77,27 +81,35 @@
 
 ## Выполнено в последней сессии
 
-**Задача:** Контейнеризация приложения — **ВЫПОЛНЕНО**
+**Задача:** PostgreSQL в Docker — **ВЫПОЛНЕНО**
 
-Созданы:
-- `Dockerfile` — 3-stage сборка (deps → builder → runner), образ `node:20-alpine`, non-root user
-- `.dockerignore` — исключены `node_modules`, `.next`, `.env*`, `.git`, документация
-- `docker-compose.yml` — сервис `app`, порт `127.0.0.1:3000:3000`, заготовки для PostgreSQL / Redis / worker
-- README.md обновлён: разделы «Запуск через Docker» и «Деплой на VPS»
-- AGENTS.md обновлён: раздел инфраструктуры и деплоя
+Создано/изменено:
+- `docker-compose.yml` — активирован `postgres:17-alpine` с healthcheck; `app` стартует только после `service_healthy`; bind-mount `.docker/postgres-data/`
+- `src/env/local/docker-compose.yml` — только PostgreSQL для локальной разработки вне Docker; bind-mount `src/env/local/postgres-data/`
+- `.env.example` — шаблон с `POSTGRES_*` и `DATABASE_URL`, документирует разницу local/production
+- `.gitignore` — добавлены `.docker/`, `src/env/local/postgres-data/`, `!.env.example`
+- `.dockerignore` — добавлены `src/env/`, `.docker/`
+- `README.md` — разделы «База данных», «Резервное копирование», «Troubleshooting», обновлён «Быстрый старт»
+- `AGENTS.md` — обновлён раздел инфраструктуры: local vs production workflow
 
 ---
 
 ## Следующий шаг
 
-**Задача:** Выбрать и подключить базу данных.
+**Задача:** Выбрать и подключить ORM.
 
 **Что значит «готово»:**
-- Выбрана СУБД (предпочтение: PostgreSQL 16)
-- Выбрана ORM (предпочтение: Prisma или Drizzle)
-- `postgres` сервис раскомментирован в `docker-compose.yml`
-- Добавлен `.env.example` с `DATABASE_URL`
-- Первая миграция создана и применена
+- Выбрана ORM (предпочтение: Prisma)
+- Установлены зависимости (`prisma`, `@prisma/client`)
+- `prisma/schema.prisma` создан с подключением к PostgreSQL
+- Первая миграция (`prisma migrate dev`) применена локально
+- `DATABASE_URL` читается из `process.env` в коде приложения
+- `prisma generate` добавлен в `postinstall` скрипт `package.json`
+
+**Масштабирование и будущие сервисы:**
+- Redis — раскомментировать блок в `docker-compose.yml`, добавить `REDIS_URL` в `.env.example`
+- Фоновые задачи — добавить `Dockerfile.worker` и раскомментировать `worker` сервис
+- Мониторинг — раскомментировать `monitoring` блок, добавить `prometheus.yml`
 
 ---
 

@@ -15,6 +15,10 @@ node_modules
 .env.production
 .env.*.local
 
+# Local dev infrastructure — not needed in production image
+src/env/
+.docker/
+
 # Docker artefacts (no need to copy into the build context)
 Dockerfile
 .dockerignore

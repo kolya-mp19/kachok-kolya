@@ -87,7 +87,18 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 ## Docker & Infrastructure
 
-### Container architecture
+### Compose file layout
+
+| File | Purpose | When to use |
+|---|---|---|
+| `docker-compose.yml` (root) | Production stack: app + postgres | VPS deployment |
+| `src/env/local/docker-compose.yml` | Local DB only | Local development |
+
+**Key rule:** local development runs Next.js with `npm run dev` outside Docker.
+Only the database runs in Docker locally. This gives fast hot-reload without
+sacrificing a consistent database environment.
+
+### Container architecture (Next.js image)
 
 The application is containerized with a 3-stage Dockerfile:
 
@@ -100,54 +111,97 @@ The application is containerized with a 3-stage Dockerfile:
 The final image contains only production dependencies and the `.next` build output.
 No source files, no dev dependencies, no secrets.
 
-### Port binding
+### Environment files
 
-`docker-compose.yml` binds the app port to `127.0.0.1:3000:3000` (localhost-only).
-nginx on the VPS proxies `kachok-kolya.duckdns.org → http://127.0.0.1:3000`.
-**Never** change the binding to `0.0.0.0:3000:3000` on production — that would
-expose Node.js directly to the internet, bypassing nginx.
+| File | Committed | Loaded by | Purpose |
+|---|---|---|---|
+| `.env.example` | **yes** | — | Template; documents all variables |
+| `.env` | no | `docker-compose.yml` (env_file) | Production secrets on VPS |
+| `.env.local` | no | Next.js dev server | Local dev secrets |
 
-### Deployment workflow
+Rules:
+- **Never** commit `.env` or `.env.local`.
+- **Always** update `.env.example` when adding a new environment variable.
+- The `DATABASE_URL` host differs: `postgres` (Docker network) vs `localhost` (local dev).
+
+### Database volumes
+
+| Environment | Host path | gitignored |
+|---|---|---|
+| Production | `.docker/postgres-data/` | yes |
+| Local dev | `src/env/local/postgres-data/` | yes |
+
+Both are bind-mounts. Docker creates the directories automatically on first run.
+**Never delete `.docker/postgres-data/` on the VPS without taking a backup first.**
+
+### Local development workflow
 
 ```bash
-# First deploy or after infrastructure changes
-git pull && docker compose up --build -d
+# Start the database
+docker compose -f src/env/local/docker-compose.yml up -d
 
-# Code-only update (no dependency or config changes)
-git pull && docker compose up --build -d
+# Run Next.js outside Docker (fast hot-reload)
+npm run dev
 
-# Check running containers
-docker compose ps
+# Stop the database (data persists in src/env/local/postgres-data/)
+docker compose -f src/env/local/docker-compose.yml down
 
-# Stream application logs
-docker compose logs -f app
-
-# Rollback: restart the previous image (if not yet pruned)
-docker compose restart app
+# Wipe local database completely
+docker compose -f src/env/local/docker-compose.yml down
+rm -rf src/env/local/postgres-data/
 ```
+
+### Production deployment workflow
+
+```bash
+# On VPS
+git pull
+docker compose up --build -d   # rebuilds app image; postgres container is reused
+docker compose ps               # verify all services are healthy
+docker compose logs app --tail=50
+```
+
+### Port binding rules
+
+- **All** ports on production VPS are bound to `127.0.0.1` (localhost-only).
+- nginx proxies `kachok-kolya.duckdns.org → http://127.0.0.1:3000`.
+- PostgreSQL is at `127.0.0.1:5432` — accessible for admin tools, not the internet.
+- **Never** change a binding to `0.0.0.0` on production.
+
+### Startup order (production)
+
+```
+postgres (healthcheck: pg_isready)
+    └─► app (depends_on: postgres, condition: service_healthy)
+```
+
+The `app` container will not start until `postgres` passes its healthcheck.
+`start_period: 30s` gives PostgreSQL time to initialize on first boot.
 
 ### Adding future services
 
-`docker-compose.yml` contains commented-out blocks for:
-- **PostgreSQL** — uncomment `postgres` service and `postgres_data` volume
-- **Redis** — uncomment `redis` service and `redis_data` volume
-- **Background worker** — uncomment `worker` service; create `Dockerfile.worker`
+`docker-compose.yml` contains commented-out blocks ready to activate:
 
-Steps to activate a service:
+| Service | Block label | What to also do |
+|---|---|---|
+| Redis | `redis:` | Add `REDIS_URL` to `.env.example`; update `depends_on` in `app` and `worker` |
+| Background worker | `worker:` | Create `Dockerfile.worker`; add `depends_on` postgres + redis |
+| Monitoring | `monitoring:` | Create `monitoring/prometheus.yml` |
+
+Steps to activate any service:
 1. Uncomment the block in `docker-compose.yml`.
-2. Add required env vars to `.env` (and document them in `.env.example`).
-3. Uncomment `depends_on` in the `app` service.
-4. Uncomment the named volume at the bottom of the file.
-5. Run `docker compose up -d --build`.
+2. Add env vars to `.env.example` (with placeholder) and to `.env` on VPS.
+3. Update `depends_on` in services that need it.
+4. Run `docker compose up -d` (no rebuild needed for new services without a build step).
 
 ### Infrastructure rules for AI agents
 
-- Always keep `README.md`, `PLANNING.md`, and `AGENTS.md` in sync with infra changes.
-- Never commit `.env` files; only commit `.env.example` with placeholder values.
-- When adding a new service, document it in both `docker-compose.yml` (inline comments)
-  and this file.
+- Always keep `README.md`, `PLANNING.md`, and `AGENTS.md` in sync with every infra change.
+- Never commit `.env` or `.env.local`; only commit `.env.example`.
+- When adding any environment variable: add it to `.env.example` with a comment explaining its purpose and the difference between local and production values.
 - Use `127.0.0.1` bindings for all ports on production VPS.
 - After every infrastructure change, update the **Следующий шаг** section in `PLANNING.md`.
+- When activating a commented-out service, move its documentation from "future" to "active" in this file.
 
 ## Delivery Checklist
 
