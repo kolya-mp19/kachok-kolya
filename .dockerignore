@@ -1,0 +1,44 @@
+# Version control
+.git
+.gitignore
+
+# Dependencies — reinstalled fresh inside the image
+node_modules
+
+# Build output — regenerated inside the image
+.next
+
+# Secrets — never bake env files into the image
+.env
+.env.local
+.env.development
+.env.production
+.env.*.local
+
+# Local dev infrastructure — not needed in production image
+src/env/
+.docker/
+
+# Docker artefacts (no need to copy into the build context)
+Dockerfile
+.dockerignore
+docker-compose*.yml
+
+# Documentation
+*.md
+
+# IDE / editor
+.vscode
+.idea
+*.swp
+*.swo
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*

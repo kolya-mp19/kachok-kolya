@@ -1,0 +1,87 @@
+services:
+
+  # ── PostgreSQL ──────────────────────────────────────────────────────────────
+  # Starts first; the app waits for a healthy signal before booting.
+  postgres:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-kachok}
+      POSTGRES_USER: ${POSTGRES_USER:-kachok}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-kachok_dev}
+    volumes:
+      # Bind-mount keeps data on the host filesystem, survives container recreation.
+      # The .docker/ directory is gitignored — never committed.
+      - .docker/postgres-data:/var/lib/postgresql/data
+    ports:
+      # Localhost-only binding: accessible on the VPS for admin tools (psql, Adminer),
+      # but not reachable from the public internet.
+      - "127.0.0.1:5432:5432"
+    healthcheck:
+      # $$VAR — double-dollar escapes compose interpolation; shell inside the
+      # container expands it from the container's own environment.
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  # ── Next.js application ────────────────────────────────────────────────────
+  # Starts only after postgres passes its healthcheck.
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    # Localhost-only: nginx proxies kachok-kolya.duckdns.org → http://127.0.0.1:3000
+    ports:
+      - "127.0.0.1:3000:3000"
+    restart: unless-stopped
+    # All vars from .env are forwarded to the container (DATABASE_URL, POSTGRES_*, etc.)
+    # required: false — compose won't fail if .env is absent (falls back to shell env / defaults)
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      # Always override to production regardless of what .env contains
+      - NODE_ENV=production
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  # ── Redis (add for sessions / caching / BullMQ job queues) ─────────────────
+  # redis:
+  #   image: redis:7-alpine
+  #   restart: unless-stopped
+  #   command: redis-server --save 60 1 --loglevel warning
+  #   volumes:
+  #     - .docker/redis-data:/data
+  #   ports:
+  #     - "127.0.0.1:6379:6379"
+  #   healthcheck:
+  #     test: ["CMD", "redis-cli", "ping"]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 5
+
+  # ── Background worker (AI tasks, email, scheduled jobs) ────────────────────
+  # worker:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile.worker
+  #   restart: unless-stopped
+  #   env_file:
+  #     - .env
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
+  #     redis:
+  #       condition: service_healthy
+
+  # ── Monitoring / observability (Prometheus, Grafana, etc.) ─────────────────
+  # monitoring:
+  #   image: prom/prometheus:latest
+  #   restart: unless-stopped
+  #   volumes:
+  #     - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+  #   ports:
+  #     - "127.0.0.1:9090:9090"
