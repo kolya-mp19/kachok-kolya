@@ -9,17 +9,9 @@ import { useAuth } from '@/lib/auth/auth-context';
 import styles from './Header.module.css';
 
 export default function Header() {
-  const { user, isLoading, logout } = useAuth();
+  const { user, isLoading } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
-
-  async function handleLogout() {
-    try {
-      await logout();
-    } catch {
-      // logout clears state regardless — nothing to handle here
-    }
-  }
 
   return (
     <>
@@ -33,12 +25,7 @@ export default function Header() {
             {isLoading ? (
               <div className={styles.skeleton} aria-hidden="true" />
             ) : user ? (
-              <>
-                <span className={styles.userName}>Hi, {user.name.split(' ')[0]}</span>
-                <button className={styles.authBtn} onClick={handleLogout}>
-                  Выйти
-                </button>
-              </>
+              <span className={styles.userName}>Привет, {user.name.split(' ')[0]}</span>
             ) : (
               <button className={styles.authBtn} onClick={() => setModalOpen(true)}>
                 Войти
@@ -48,7 +35,7 @@ export default function Header() {
             <button
               className={styles.burger}
               onClick={() => setSidebarOpen(true)}
-              aria-label="Open menu"
+              aria-label="Открыть меню"
               aria-expanded={sidebarOpen}
             >
               <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">

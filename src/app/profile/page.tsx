@@ -16,8 +16,8 @@ function formatDate(iso?: string): string {
 }
 
 const GENDER_LABEL: Record<string, string> = {
-  male: 'Male',
-  female: 'Female',
+  male: 'Мужской',
+  female: 'Женский',
 };
 
 export default function ProfilePage() {
@@ -35,29 +35,29 @@ export default function ProfilePage() {
   return (
     <div className={styles.page}>
       <main className={styles.main}>
-        <h1 className={styles.heading}>Welcome, {user.name}</h1>
+        <h1 className={styles.heading}>Добро пожаловать, {user.name}</h1>
 
         <div className={styles.sections}>
           <section className={styles.section}>
-            <h2 className={styles.sectionHeading}>Personal Info</h2>
+            <h2 className={styles.sectionHeading}>Личная информация</h2>
             <dl className={styles.dl}>
               <dt>Email</dt>
               <dd>{user.email}</dd>
-              <dt>Gender</dt>
+              <dt>Пол</dt>
               <dd>{user.gender ? GENDER_LABEL[user.gender] : '—'}</dd>
-              <dt>Member since</dt>
+              <dt>Участник с</dt>
               <dd>{formatDate(user.createdAt)}</dd>
             </dl>
           </section>
 
           <section className={styles.section}>
-            <h2 className={styles.sectionHeading}>Training History</h2>
-            <p className={styles.placeholder}>Coming soon</p>
+            <h2 className={styles.sectionHeading}>История тренировок</h2>
+            <p className={styles.placeholder}>Скоро</p>
           </section>
 
           <section className={styles.section}>
-            <h2 className={styles.sectionHeading}>Personal Records</h2>
-            <p className={styles.placeholder}>Coming soon</p>
+            <h2 className={styles.sectionHeading}>Личные рекорды</h2>
+            <p className={styles.placeholder}>Скоро</p>
           </section>
         </div>
       </main>

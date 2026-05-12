@@ -17,9 +17,9 @@ interface Props {
 }
 
 const GENDER_OPTIONS = [
-  { value: '', label: 'Prefer not to say' },
-  { value: 'male', label: 'Male' },
-  { value: 'female', label: 'Female' },
+  { value: '', label: 'Не указывать' },
+  { value: 'male', label: 'Мужской' },
+  { value: 'female', label: 'Женский' },
 ];
 
 export default function AuthModal({ isOpen, onClose }: Props) {
@@ -87,9 +87,9 @@ export default function AuthModal({ isOpen, onClose }: Props) {
           {/* ── Header ───────────────────────────────────── */}
           <div className={styles.panelHeader}>
             <DialogTitle className={styles.title}>
-              {tab === 'login' ? 'Sign in' : 'Create account'}
+              {tab === 'login' ? 'Вход' : 'Регистрация'}
             </DialogTitle>
-            <button className={styles.closeBtn} onClick={handleClose} aria-label="Close">
+            <button className={styles.closeBtn} onClick={handleClose} aria-label="Закрыть">
               <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
                 <path
                   d="M2 2L16 16M16 2L2 16"
@@ -110,7 +110,7 @@ export default function AuthModal({ isOpen, onClose }: Props) {
               className={`${styles.tab} ${tab === 'login' ? styles.tabActive : ''}`}
               onClick={() => switchTab('login')}
             >
-              Sign in
+              Вход
             </button>
             <button
               role="tab"
@@ -119,7 +119,7 @@ export default function AuthModal({ isOpen, onClose }: Props) {
               className={`${styles.tab} ${tab === 'register' ? styles.tabActive : ''}`}
               onClick={() => switchTab('register')}
             >
-              Register
+              Регистрация
             </button>
           </div>
 
@@ -135,7 +135,7 @@ export default function AuthModal({ isOpen, onClose }: Props) {
                 placeholder="you@example.com"
               />
               <InputField
-                label="Password"
+                label="Пароль"
                 value={loginPassword}
                 onChange={setLoginPassword}
                 type="password"
@@ -143,7 +143,7 @@ export default function AuthModal({ isOpen, onClose }: Props) {
               />
               {error && <p className={styles.error}>{error}</p>}
               <Button type="submit" variant="primary" disabled={isLoading}>
-                {isLoading ? 'Signing in…' : 'Sign in'}
+                {isLoading ? 'Вход…' : 'Войти'}
               </Button>
             </form>
           )}
@@ -152,10 +152,10 @@ export default function AuthModal({ isOpen, onClose }: Props) {
           {tab === 'register' && (
             <form onSubmit={submitRegister} className={styles.form} noValidate>
               <InputField
-                label="Name"
+                label="Имя"
                 value={regName}
                 onChange={setRegName}
-                placeholder="Your name"
+                placeholder="Ваше имя"
               />
               <InputField
                 label="Email"
@@ -166,21 +166,21 @@ export default function AuthModal({ isOpen, onClose }: Props) {
                 placeholder="you@example.com"
               />
               <InputField
-                label="Password"
+                label="Пароль"
                 value={regPassword}
                 onChange={setRegPassword}
                 type="password"
-                placeholder="Min 8 characters"
+                placeholder="Не менее 8 символов"
               />
               <SelectField
-                label="Gender (optional)"
+                label="Пол (необязательно)"
                 value={regGender}
                 onChange={setRegGender}
                 options={GENDER_OPTIONS}
               />
               {error && <p className={styles.error}>{error}</p>}
               <Button type="submit" variant="primary" disabled={isLoading}>
-                {isLoading ? 'Creating account…' : 'Create account'}
+                {isLoading ? 'Регистрация…' : 'Зарегистрироваться'}
               </Button>
             </form>
           )}

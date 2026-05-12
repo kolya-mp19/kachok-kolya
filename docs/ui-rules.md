@@ -5,6 +5,26 @@
 
 ---
 
+## Language
+
+**All user-facing text must be in Russian.** No English strings in UI components.
+
+| Applies to | Examples |
+|---|---|
+| Labels, placeholders, hints | `Пароль`, `Ваше имя`, `Не менее 8 символов` |
+| Button text | `Войти`, `Зарегистрироваться`, `Выйти` |
+| Navigation links | `Калькулятор`, `Профиль` |
+| Section headings | `Личная информация`, `История тренировок` |
+| Empty / loading states | `Скоро`, `Загрузка…` |
+| Error messages | server error strings passed through from the API |
+| `aria-label` attributes | `Закрыть`, `Открыть меню` |
+
+**Exceptions** — keep as-is:
+- `Email` — universally understood technical term, no Russian equivalent in common use
+- Code identifiers, prop names, comments in source files
+
+---
+
 ## Color system
 
 All colors are defined as CSS custom properties in [`src/styles/variables.css`](../src/styles/variables.css).
