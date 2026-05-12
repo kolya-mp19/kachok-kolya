@@ -1,8 +1,9 @@
+/* Base = mobile (375px) */
 .athleteCard {
-  border: 1px solid #d6deec;
+  border: 1px solid var(--color-border);
   border-radius: 12px;
   padding: 14px;
-  background-color: #f8fbff;
+  background-color: var(--color-surface-raised);
   display: grid;
   gap: 12px;
 }
@@ -15,8 +16,8 @@
 }
 
 .cardTop h2 {
-  font-size: 18px;
-  color: #1f2937;
+  font-size: 16px;
+  color: var(--color-text-body);
 }
 
 .cardActions {
@@ -27,18 +28,27 @@
 
 .fieldsGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  grid-template-columns: 1fr;
   gap: 10px;
 }
 
 .attemptsGrid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: 1fr;
   gap: 10px;
 }
 
-@media (max-width: 768px) {
+/* Desktop additions */
+@media (min-width: 640px) {
+  .cardTop h2 {
+    font-size: 18px;
+  }
+
+  .fieldsGrid {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  }
+
   .attemptsGrid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }

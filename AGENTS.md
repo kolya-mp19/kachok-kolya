@@ -64,6 +64,36 @@ This version has breaking changes — APIs, conventions, and file structure may 
 - Sorting/ranking behavior must remain predictable after UI changes.
 - Text labels should be concise and user-facing (no technical wording).
 
+## UI rules — STRICT, never violate
+- Mobile-first is mandatory. Every component starts with mobile layout.
+  Desktop styles are always additions via media queries in CSS modules, never the base.
+- Never write a layout without checking it at 375px width first.
+- CSS Modules media query order: base styles (mobile) → min-width: 640px → min-width: 768px → min-width: 1024px
+  Never start with max-width queries — that is desktop-first.
+
+  Correct:
+  .button { width: 100%; }
+  @media (min-width: 768px) { .button { width: auto; } }
+
+  Wrong:
+  .button { width: auto; }
+  @media (max-width: 768px) { .button { width: 100%; } }
+
+- Touch targets minimum 44×44px on all interactive elements.
+- Font sizes: minimum 16px for body text and inputs — prevents iOS auto-zoom on focus.
+- Spacing: minimum 12px padding inside tap areas, minimum 8px gap between interactive elements.
+- Forms in the gym are filled with one thumb. Input fields must be large: minimum height 48px.
+- Never use hover-only interactions. Every hover state must have an equivalent active/focus state.
+- Test mentally at 375px (iPhone SE) before suggesting any layout.
+- All colors must be defined as CSS custom properties in `src/styles/variables.css`.
+  Never use hardcoded color values in CSS modules — always reference a variable.
+  Variables are loaded globally via `globals.css`; no extra import needed in modules.
+  Use semantic names that describe PURPOSE, not appearance:
+  - Correct: `--color-text-heading`, `--color-primary`, `--color-border-input`
+  - Wrong: `--color-blue-500`, `--gray`, `--hex-111827`
+
+Full UI reference with examples: `docs/ui-rules.md`
+
 ## Testing and Verification
 
 - After substantive edits, check lints for changed files.

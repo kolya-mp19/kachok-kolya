@@ -45,6 +45,8 @@
 | Форматирование | Prettier 3 | Единый стиль кода |
 | База данных | PostgreSQL 17 (Alpine) | Надёжная, хорошо поддерживается ORM, совместима с Docker |
 | ORM | Drizzle ORM 0.45 + drizzle-kit 0.31, `postgres` драйвер | Лёгкий, type-safe, SQL-first, хорошо работает с App Router |
+| UI approach | Mobile-first + CSS Modules | App is used in gym on phone, desktop is secondary |
+| Styling | CSS Modules (no Tailwind) | Already in project, scoped styles per component |
 | Аутентификация | **NOT YET DECIDED** (Clerk или Auth.js) | — |
 | Контейнеризация | Docker + Compose (multi-stage, node:20-alpine) | Лёгкий образ, безопасный non-root запуск, совместим с VPS nginx |
 | MCP-сервер | **NOT YET DECIDED** (планируется в v2) | — |
