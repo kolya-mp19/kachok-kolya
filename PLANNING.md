@@ -34,50 +34,55 @@
 
 ## Принятые технические решения
 
-| Решение | Технология | Причина |
-|---|---|---|
-| Фреймворк | Next.js 16, App Router | SSR для будущих API-роутов и SEO |
-| UI-библиотека | React 19 | Последняя стабильная версия |
-| Язык | TypeScript 5, strict mode | Надёжность типов во всём проекте |
-| Стили | CSS Modules | Изоляция стилей без внешних зависимостей |
-| ID генерация | nanoid | Лёгкая замена uuid, уже в проекте |
-| Линтер | ESLint 9 flat config + @typescript-eslint | Современный конфиг, совместим с TS |
-| Форматирование | Prettier 3 | Единый стиль кода |
-| База данных | PostgreSQL 17 (Alpine) | Надёжная, хорошо поддерживается ORM, совместима с Docker |
-| ORM | Drizzle ORM 0.45 + drizzle-kit 0.31, `postgres` драйвер | Лёгкий, type-safe, SQL-first, хорошо работает с App Router |
-| UI approach | Mobile-first + CSS Modules | App is used in gym on phone, desktop is secondary |
-| Styling | CSS Modules (no Tailwind) | Already in project, scoped styles per component |
-| Аутентификация | **NOT YET DECIDED** (Clerk или Auth.js) | — |
-| Контейнеризация | Docker + Compose (multi-stage, node:20-alpine) | Лёгкий образ, безопасный non-root запуск, совместим с VPS nginx |
-| MCP-сервер | **NOT YET DECIDED** (планируется в v2) | — |
+| Решение         | Технология                                              | Причина                                                         |
+| --------------- | ------------------------------------------------------- | --------------------------------------------------------------- |
+| Фреймворк       | Next.js 16, App Router                                  | SSR для будущих API-роутов и SEO                                |
+| UI-библиотека   | React 19                                                | Последняя стабильная версия                                     |
+| Язык            | TypeScript 5, strict mode                               | Надёжность типов во всём проекте                                |
+| Стили           | CSS Modules                                             | Изоляция стилей без внешних зависимостей                        |
+| ID генерация    | nanoid                                                  | Лёгкая замена uuid, уже в проекте                               |
+| Линтер          | ESLint 9 flat config + @typescript-eslint               | Современный конфиг, совместим с TS                              |
+| Форматирование  | Prettier 3                                              | Единый стиль кода                                               |
+| База данных     | PostgreSQL 17 (Alpine)                                  | Надёжная, хорошо поддерживается ORM, совместима с Docker        |
+| ORM             | Drizzle ORM 0.45 + drizzle-kit 0.31, `postgres` драйвер | Лёгкий, type-safe, SQL-first, хорошо работает с App Router      |
+| UI approach     | Mobile-first + CSS Modules                              | App is used in gym on phone, desktop is secondary               |
+| Styling         | CSS Modules (no Tailwind)                               | Already in project, scoped styles per component                 |
+| Аутентификация  | **NOT YET DECIDED** (Clerk или Auth.js)                 | —                                                               |
+| Контейнеризация | Docker + Compose (multi-stage, node:20-alpine)          | Лёгкий образ, безопасный non-root запуск, совместим с VPS nginx |
+| MCP-сервер      | **NOT YET DECIDED** (планируется в v2)                  | —                                                               |
 
 ---
 
 ## Дорожная карта
 
 ### Инфраструктура
+
 - [x] Контейнеризировать приложение (Dockerfile + docker-compose)
 - [x] Поднять PostgreSQL в Docker (production + local dev compose-файлы)
 - [x] Выбрать и подключить ORM (Drizzle ORM + drizzle-kit + postgres driver)
 - [x] Автоматический запуск миграций при старте контейнера (scripts/start.sh)
-- [ ] Выбрать стратегию аутентификации (NOT YET DECIDED: Clerk или Auth.js)
+- [x] Выбрать стратегию аутентификации (NOT YET DECIDED: Clerk или Auth.js)
 
 ### v1 — MVP
+
 - [ ] Личный кабинет / страница профиля пользователя
 - [ ] Журнал тренировок (mobile-first UI)
 - [ ] Базовая статистика: тоннаж, регулярность
 
 ### v2 — AI
+
 - [ ] Настройка MCP-сервера
 - [ ] Интеграция чата с Claude
 - [ ] Функция целей пользователя (похудение / набор массы / сила)
 
 ### v3 — Планирование
+
 - [ ] Генерация тренировочных планов
 - [ ] Автоматическая прогрессия рабочих весов
 - [ ] Трекер восстановления (сон, RPE)
 
 ### v4 — Питание
+
 - [ ] Дневник питания и КБЖУ
 - [ ] Калькулятор макросов под цель
 - [ ] AI-анализ питания в связке с тренировочными данными
@@ -89,6 +94,7 @@
 **Задача:** Автозапуск миграций в Docker — **ВЫПОЛНЕНО**
 
 Создано/изменено:
+
 - `scripts/start.sh` — запускает `npm run db:migrate`, затем `exec node server.js`; `set -e` гарантирует остановку контейнера при ошибке миграции
 - `next.config.ts` — добавлен `output: 'standalone'`; генерирует `server.js` для запуска без `next` CLI
 - `Dockerfile` runner-стейдж — переведён на standalone-output: копирует `.next/standalone/`, `.next/static`, `public/`, полный `node_modules` из builder (включая `drizzle-kit`), `src/db/migrations/`, `drizzle.config.ts`, `scripts/`; CMD заменён на `["scripts/start.sh"]`
@@ -98,6 +104,7 @@
 **Задача:** Drizzle ORM — **ВЫПОЛНЕНО**
 
 Создано/изменено:
+
 - `drizzle.config.ts` — конфиг drizzle-kit: dialect postgresql, schema `src/db/schema/index.ts`, out `src/db/migrations/`
 - `src/db/index.ts` — singleton drizzle-клиент на `postgres` драйвере, global-паттерн против утечек при hot reload
 - `src/db/schema/users.ts` — таблица `users`, enum `gender`
@@ -117,6 +124,7 @@
 > Инфраструктура готова: БД поднята, миграции применяются автоматически, Next.js запускается через standalone-образ.
 
 **Что значит «готово»:**
+
 - Установлен `@clerk/nextjs`
 - `CLERK_SECRET_KEY` и `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` добавлены в `.env.example` и `.env`
 - `middleware.ts` настроен для защиты роутов
@@ -125,6 +133,7 @@
 - `userId` из Clerk используется как FK в таблице `users` (или через отдельный маппинг)
 
 **Масштабирование и будущие сервисы:**
+
 - Redis — раскомментировать блок в `docker-compose.yml`, добавить `REDIS_URL` в `.env.example`
 - Фоновые задачи — добавить `Dockerfile.worker` и раскомментировать `worker` сервис
 - Мониторинг — раскомментировать `monitoring` блок, добавить `prometheus.yml`
