@@ -46,4 +46,7 @@
   /* --- Shadows --- */
   --color-shadow-card: rgba(14, 42, 85, 0.08);  /* main panel drop shadow */
   --color-shadow-btn: rgba(15, 23, 42, 0.15);   /* button hover shadow */
+
+  /* --- Overlay --- */
+  --color-overlay: rgba(0, 0, 0, 0.4);          /* sidebar backdrop */
 }

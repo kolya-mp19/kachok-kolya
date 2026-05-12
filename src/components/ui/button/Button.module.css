@@ -26,6 +26,13 @@
   outline-offset: 2px;
 }
 
+.base:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
 .primary {
   background: var(--color-primary);
   color: var(--color-primary-text);

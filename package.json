@@ -16,6 +16,7 @@
     "db:push": "drizzle-kit push"
   },
   "dependencies": {
+    "@headlessui/react": "^2.2.10",
     "bcryptjs": "^3.0.3",
     "drizzle-orm": "^0.45.2",
     "jose": "^6.2.3",

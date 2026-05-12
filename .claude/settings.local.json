@@ -21,7 +21,12 @@
       "PowerShell($start = Get-Date; do { $status = docker inspect local-postgres-1 --format \"{{.State.Health.Status}}\" 2>&1; Write-Host $status; if \\($status -eq \"healthy\"\\) { break }; Start-Sleep 2 } until \\(\\(Get-Date\\) - $start -gt [TimeSpan]::FromSeconds\\(40\\)\\))",
       "Bash(npx tsc *)",
       "Bash(Get-ChildItem -Path \"d:\\\\projects\\\\kachok-kolya\" -Force)",
-      "Bash(Select-Object -Property Name, FullName)"
+      "Bash(Select-Object -Property Name, FullName)",
+      "Bash(Get-ChildItem -Path \"d:\\\\projects\\\\kachok-kolya\\\\src\" -Recurse -Force)",
+      "Bash(Select-Object -Property FullName, PSIsContainer)",
+      "Bash(Sort-Object FullName)",
+      "Bash(Get-ChildItem -Path \"d:\\\\projects\\\\kachok-kolya\\\\src\\\\db\" -Recurse)",
+      "Bash(Select-Object -ExpandProperty FullName)"
     ]
   }
 }
