@@ -15,6 +15,13 @@
       "when": 1778604431854,
       "tag": "0001_broad_adam_warlock",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1747180800000,
+      "tag": "0002_oauth_providers",
+      "breakpoints": true
     }
   ]
 }

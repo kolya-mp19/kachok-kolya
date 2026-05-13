@@ -6,7 +6,13 @@ Stateless JWT authentication with two tokens — a short-lived **access token** 
 long-lived **refresh token** — stored as `httpOnly` cookies. No server-side sessions,
 no Auth.js / NextAuth, no Passport.
 
-The architecture is intentionally boring: two signed JWTs, two DB columns, five API
+Two login paths are supported:
+
+- **Email + password** — classic credential flow with bcrypt.
+- **OAuth 2.0** — Yandex and VKontakte. The server exchanges the provider code for a
+  user profile, then issues the same JWT pair. No third-party session is kept.
+
+The architecture is intentionally boring: two signed JWTs, two DB columns, seven API
 routes. Every decision is explicit in code; nothing is hidden in a framework.
 
 **Why this design for a Next.js AI-assisted project:**
@@ -31,9 +37,15 @@ routes. Every decision is explicit in code; nothing is hidden in a framework.
 | `id` | `uuid` | PK, `DEFAULT gen_random_uuid()` |
 | `email` | `text` | UNIQUE, NOT NULL |
 | `name` | `text` | NOT NULL |
-| `password_hash` | `text` | NOT NULL |
+| `password_hash` | `text` | nullable — NULL for OAuth-only accounts |
+| `provider` | `text` | nullable (`'yandex'` \| `'vk'`) |
+| `provider_id` | `text` | nullable — user ID from the OAuth provider |
 | `gender` | `gender` enum | nullable (`'male' \| 'female'`) |
 | `created_at` | `timestamp` | `DEFAULT now()` |
+
+A partial unique index on `(provider, provider_id) WHERE provider IS NOT NULL` prevents
+duplicate OAuth accounts while allowing multiple email+password users (where both
+columns are NULL).
 
 #### `refresh_tokens`
 
@@ -56,8 +68,10 @@ erDiagram
         uuid id PK
         text email UK
         text name
-        text password_hash
-        gender gender
+        text password_hash "nullable"
+        text provider "nullable"
+        text provider_id "nullable"
+        gender gender "nullable"
         timestamp created_at
     }
     refresh_tokens {
@@ -223,6 +237,40 @@ sequenceDiagram
     S-->>C: 200 { success: true }<br>Set-Cookie: access_token=; MaxAge=0<br>Set-Cookie: refresh_token=; MaxAge=0; Path=/api/auth/refresh
 ```
 
+### OAuth Login (Yandex / VK)
+
+```mermaid
+sequenceDiagram
+    participant U as User (browser)
+    participant R as GET /api/auth/{provider}
+    participant P as OAuth Provider
+    participant CB as GET /api/auth/{provider}/callback
+    participant DB as PostgreSQL
+
+    U->>R: Click "Войти через Яндекс / ВКонтакте"
+    R->>R: generateState() — nanoid(32)
+    R-->>U: 302 → provider /authorize?...&state=<s><br>Set-Cookie: oauth_state=<s>; httpOnly; maxAge=600
+
+    U->>P: Follow redirect (user logs in / consents)
+    P-->>U: 302 → /api/auth/{provider}/callback?code=<c>&state=<s>
+
+    U->>CB: GET /callback?code=<c>&state=<s><br>Cookie: oauth_state=<s>
+    CB->>CB: Verify state === cookie — reject if mismatch (CSRF guard)
+    CB->>P: POST /token — exchange code → access_token
+    CB->>P: GET /userinfo — fetch id, name, email
+    CB->>DB: SELECT * FROM users WHERE provider=? AND provider_id=?
+    alt User exists
+        DB-->>CB: existing user row
+    else Email already registered (different login method)
+        CB->>DB: UPDATE users SET provider, provider_id WHERE email=?
+    else New user
+        CB->>DB: INSERT INTO users (email, name, provider, provider_id)
+    end
+    CB->>CB: signAccessToken + signRefreshToken
+    CB->>DB: INSERT INTO refresh_tokens
+    CB-->>U: 302 → /<br>Set-Cookie: access_token + refresh_token<br>Delete-Cookie: oauth_state
+```
+
 ---
 
 ## API Reference
@@ -378,6 +426,69 @@ Returns the authenticated user's profile. Does not attempt a token refresh.
 
 ---
 
+### `GET /api/auth/yandex`
+
+Initiates the Yandex OAuth 2.0 flow. Generates a `state` token, stores it in an
+`httpOnly` cookie, and redirects the browser to Yandex's authorization endpoint.
+
+**Request:** none (browser navigation).
+
+**Response:** `302` redirect to `https://oauth.yandex.ru/authorize`.
+
+---
+
+### `GET /api/auth/yandex/callback`
+
+Handles the redirect back from Yandex. Verifies the `state` parameter, exchanges the
+authorization code for a Yandex access token, fetches the user profile from
+`https://login.yandex.ru/info`, and issues app session cookies.
+
+**Query params (set by Yandex):** `code`, `state`
+
+**Success response:** `302` redirect to `/` with `access_token` + `refresh_token` cookies set.
+
+**Error responses:** `302` redirect to `/?auth_error=<reason>`
+
+| `auth_error` | Reason |
+|---|---|
+| `invalid_state` | `state` mismatch or cookie absent — possible CSRF attempt |
+| `yandex_failed` | Token exchange or user-info request failed |
+
+---
+
+### `GET /api/auth/vk`
+
+Initiates the VKontakte OAuth 2.0 flow. Requests the `email` scope. Generates a `state`
+token, stores it in an `httpOnly` cookie, and redirects to VK's authorization endpoint.
+
+**Request:** none (browser navigation).
+
+**Response:** `302` redirect to `https://oauth.vk.com/authorize`.
+
+---
+
+### `GET /api/auth/vk/callback`
+
+Handles the redirect back from VK. Verifies `state`, exchanges the code for a VK access
+token (which also carries the email if the user granted it), fetches the user's name via
+`https://api.vk.com/method/users.get`, and issues app session cookies.
+
+If VK does not return an email (user denied the permission), the account is stored with
+a stable placeholder address `vk_<user_id>@vk.placeholder.local`.
+
+**Query params (set by VK):** `code`, `state`
+
+**Success response:** `302` redirect to `/` with `access_token` + `refresh_token` cookies set.
+
+**Error responses:** `302` redirect to `/?auth_error=<reason>`
+
+| `auth_error` | Reason |
+|---|---|
+| `invalid_state` | `state` mismatch or cookie absent |
+| `vk_failed` | Token exchange or user-info request failed |
+
+---
+
 ## File Structure
 
 ```
@@ -388,13 +499,14 @@ src/
 │   └── auth/
 │       ├── jwt.ts                   # signAccessToken, signRefreshToken, verifyAccessToken, verifyRefreshToken, JwtPayload
 │       ├── cookies.ts               # setAuthCookies, clearAuthCookies, ACCESS_TOKEN_COOKIE, REFRESH_TOKEN_COOKIE
-│       └── hash.ts                  # hashToken, compareToken — SHA-256 pre-hash + bcrypt for refresh token storage
+│       ├── hash.ts                  # hashToken, compareToken — SHA-256 pre-hash + bcrypt for refresh token storage
+│       └── oauth.ts                 # findOrCreateOAuthUser, issueSessionForUser, generateState, setStateCookie
 │
 ├── db/
 │   ├── index.ts                     # Drizzle singleton instance (postgres-js driver)
 │   └── schema/
 │       ├── index.ts                 # Re-exports all tables
-│       ├── users.ts                 # users table + genderEnum
+│       ├── users.ts                 # users table + genderEnum (password_hash nullable, provider/provider_id added)
 │       └── refresh-tokens.ts       # refresh_tokens table with FK → users.id CASCADE
 │
 └── app/
@@ -408,13 +520,23 @@ src/
             │   └── route.ts         # POST — verify JWT, find+compare DB record, rotate token pair
             ├── logout/
             │   └── route.ts         # POST — delete all user refresh tokens, clear cookies
-            └── me/
-                └── route.ts         # GET — verify access token, return user without passwordHash
+            ├── me/
+            │   └── route.ts         # GET — verify access token, return user without passwordHash
+            ├── yandex/
+            │   ├── route.ts         # GET — generate state, redirect to oauth.yandex.ru/authorize
+            │   └── callback/
+            │       └── route.ts     # GET — verify state, exchange code, upsert user, issue tokens
+            └── vk/
+                ├── route.ts         # GET — generate state, redirect to oauth.vk.com/authorize
+                └── callback/
+                    └── route.ts     # GET — verify state, exchange code, upsert user, issue tokens
 ```
 
 ---
 
 ## Environment Variables
+
+### Core
 
 | Variable | Description | Example value | Required |
 |---|---|---|---|
@@ -423,9 +545,36 @@ src/
 | `JWT_ACCESS_EXPIRES_IN` | Access token TTL — jose duration string | `15m` | Yes |
 | `JWT_REFRESH_EXPIRES_IN` | Refresh token TTL — jose duration string | `7d` | Yes |
 | `DATABASE_URL` | PostgreSQL connection URL used by Drizzle + postgres-js | `postgresql://user:pass@host:5432/db` | Yes |
+| `APP_URL` | Full base URL of the app — used to build OAuth callback redirect URIs | `http://localhost:3000` | Yes |
 
 jose duration string format: `<number><unit>` where unit is `s` (seconds), `m` (minutes),
 `h` (hours), `d` (days). Example: `15m`, `1h`, `7d`.
+
+### OAuth Providers
+
+| Variable | Description | Required |
+|---|---|---|
+| `YANDEX_CLIENT_ID` | OAuth app client ID from [oauth.yandex.ru](https://oauth.yandex.ru/client/new) | Yes (for Yandex login) |
+| `YANDEX_CLIENT_SECRET` | OAuth app client secret from Yandex | Yes (for Yandex login) |
+| `VK_CLIENT_ID` | App ID from [vk.com/editapp](https://vk.com/editapp?act=create) | Yes (for VK login) |
+| `VK_CLIENT_SECRET` | Secure key from the VK app settings | Yes (for VK login) |
+
+#### Registering OAuth apps
+
+**Yandex** — [oauth.yandex.ru/client/new](https://oauth.yandex.ru/client/new)
+
+1. Create a new app, choose "Web services".
+2. Under **Callback URIs** add: `{APP_URL}/api/auth/yandex/callback`
+3. Under **Data access** enable: **Email address** (`login:email`), **Username, name** (`login:info`).
+4. Copy the **ClientID** → `YANDEX_CLIENT_ID` and **Client secret** → `YANDEX_CLIENT_SECRET`.
+
+**VK** — [vk.com/editapp?act=create](https://vk.com/editapp?act=create)
+
+1. Create a new app, type **Website**.
+2. Set **Base domain** to your domain (e.g. `localhost` for dev).
+3. Set **Authorized redirect URI** to: `{APP_URL}/api/auth/vk/callback`
+4. Go to **Settings** tab. Copy **App ID** → `VK_CLIENT_ID` and **Secure key** → `VK_CLIENT_SECRET`.
+5. The `email` scope is requested at runtime; no extra setting is needed in the app dashboard.
 
 ---
 
@@ -487,6 +636,47 @@ Refresh token hashing uses 10 rounds because the input is already a
 cryptographically random JWT (not a user-chosen weak password). The hash's purpose is
 preventing DB-dump reuse, not slowing brute force on a known weak input.
 
+### OAuth state parameter (CSRF protection)
+
+Before redirecting to the provider, the server generates a `nanoid(32)` state token,
+sets it as an `httpOnly; sameSite=lax` cookie with a 10-minute expiry, and passes it as
+the `state` query parameter in the authorization URL. The callback route compares the
+`state` query param against the cookie value and aborts with a redirect to
+`/?auth_error=invalid_state` if they differ or the cookie is absent.
+
+This prevents cross-site request forgery attacks where a malicious page could craft a
+callback URL with a valid provider code but trick the victim's browser into completing
+the login.
+
+`sameSite: lax` is sufficient here: the callback is a top-level GET navigation
+(triggered by the provider's redirect), which browsers permit under `lax`. A CSRF
+request from a third-party site would be a cross-origin non-navigation request and
+would not carry the `lax` cookie.
+
+### Account linking on first OAuth login
+
+When a user logs in via OAuth for the first time, `findOrCreateOAuthUser` checks:
+
+1. Does a row with `(provider, provider_id)` already exist? → return it.
+2. Does a row with the same email exist (e.g. the user registered via email+password)?
+   → attach `provider`/`provider_id` to that row and return it. The user now has both
+   login methods on the same account.
+3. Neither → insert a new user row without a `password_hash`.
+
+This means a user who registered with `alice@example.com` and later clicks
+"Войти через Яндекс" (where Yandex also returns `alice@example.com`) will be
+transparently linked — no duplicate account is created.
+
+### VK users without an email
+
+VK returns the email as part of the token response only when the user grants the
+`email` scope during authorization. If they deny it (or the scope is not available),
+the callback generates a stable placeholder address of the form
+`vk_<user_id>@vk.placeholder.local`. This address satisfies the NOT NULL / UNIQUE
+constraint on `users.email` while being clearly synthetic. The user is still uniquely
+identified by `(provider='vk', provider_id='<user_id>')` and the account links
+correctly on subsequent logins.
+
 ---
 
 ## Known Limitations and Future Improvements
@@ -535,3 +725,26 @@ There is no mechanism to lock an account after repeated failed login attempts.
 
 Users cannot view or selectively revoke individual sessions. All tokens can be revoked
 only by logging out (which clears all sessions).
+
+### No PKCE for OAuth
+
+The OAuth flow uses a random `state` parameter for CSRF protection but does not
+implement PKCE (Proof Key for Code Exchange). PKCE is recommended for public clients
+(SPAs, mobile apps) where the client secret cannot be kept confidential. Here the code
+exchange happens server-side (the client secret is only on the server), so PKCE is not
+strictly required — but adding it would provide defense-in-depth against authorization
+code interception.
+
+### No per-provider account unlinking
+
+Once a provider is linked to an account (`provider`/`provider_id` set), there is no
+endpoint to unlink it. A user who wants to switch from OAuth-only to email+password (or
+vice versa) must be handled manually at the database level. An account settings page
+with an unlink flow would require a dedicated endpoint.
+
+### OAuth tokens are not stored
+
+The provider access token returned during the OAuth callback is used once to fetch the
+user profile and then discarded. If future features need to call provider APIs on behalf
+of the user (e.g. posting to VK), the token would need to be persisted — ideally in a
+separate `oauth_tokens` table with encrypted storage.

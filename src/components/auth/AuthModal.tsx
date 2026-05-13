@@ -4,6 +4,9 @@ import { useState } from 'react';
 import { Dialog, DialogPanel, DialogTitle } from '@headlessui/react';
 
 import Button from '@/components/ui/button/Button';
+import CloseIcon from '@/components/ui/icon/CloseIcon';
+import VkIcon from '@/components/ui/icon/VkIcon';
+import YandexIcon from '@/components/ui/icon/YandexIcon';
 import InputField from '@/components/ui/input/InputField';
 import SelectField from '@/components/ui/select/SelectField';
 import { useAuth, type Gender } from '@/lib/auth/auth-context';
@@ -90,14 +93,7 @@ export default function AuthModal({ isOpen, onClose }: Props) {
               {tab === 'login' ? 'Вход' : 'Регистрация'}
             </DialogTitle>
             <button className={styles.closeBtn} onClick={handleClose} aria-label="Закрыть">
-              <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
-                <path
-                  d="M2 2L16 16M16 2L2 16"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                />
-              </svg>
+              <CloseIcon />
             </button>
           </div>
 
@@ -184,6 +180,19 @@ export default function AuthModal({ isOpen, onClose }: Props) {
               </Button>
             </form>
           )}
+
+          {/* ── Social login ─────────────────────────────── */}
+          <div className={styles.divider}>или</div>
+          <div className={styles.socialButtons}>
+            <a href="/api/auth/yandex" className={`${styles.socialBtn} ${styles.yandexBtn}`}>
+              <YandexIcon />
+              Войти через Яндекс
+            </a>
+            <a href="/api/auth/vk" className={`${styles.socialBtn} ${styles.vkBtn}`}>
+              <VkIcon />
+              Войти через ВКонтакте
+            </a>
+          </div>
 
         </DialogPanel>
       </div>

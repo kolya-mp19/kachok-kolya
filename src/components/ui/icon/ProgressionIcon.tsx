@@ -9,9 +9,6 @@ export default function ProgressionIcon() {
       //   style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd"
       viewBox="0 0 8.5 11"
     >
-      <defs>
-        <style type="text/css"></style>
-      </defs>
       <g id="Layer_x0020_1">
         <metadata id="CorelCorpID_0Corel-Layer" />
         <path
