@@ -1,7 +1,7 @@
 $ErrorActionPreference = 'Stop'
 
 $projectRoot = Split-Path $PSScriptRoot -Parent
-$composeFile = Join-Path $projectRoot 'src\env\local\docker-compose.yml'
+$composeFile = Join-Path $projectRoot 'env\local\docker-compose.yml'
 
 # ── 1. Start postgres ──────────────────────────────────────────────────────────
 Write-Host 'Starting local PostgreSQL...' -ForegroundColor Cyan

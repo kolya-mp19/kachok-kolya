@@ -127,7 +127,7 @@ Full UI reference with examples: `docs/ui-rules.md`
 | File                               | Purpose                          | When to use       |
 | ---------------------------------- | -------------------------------- | ----------------- |
 | `docker-compose.yml` (root)        | Production stack: app + postgres | VPS deployment    |
-| `src/env/local/docker-compose.yml` | Local DB only                    | Local development |
+| `env/local/docker-compose.yml` | Local DB only                    | Local development |
 
 **Key rule:** local development runs Next.js with `npm run dev` outside Docker.
 Only the database runs in Docker locally. This gives fast hot-reload without
@@ -165,7 +165,7 @@ Rules:
 | Environment | Host path                      | gitignored |
 | ----------- | ------------------------------ | ---------- |
 | Production  | `.docker/postgres-data/`       | yes        |
-| Local dev   | `src/env/local/postgres-data/` | yes        |
+| Local dev   | `env/local/postgres-data/` | yes        |
 
 Both are bind-mounts. Docker creates the directories automatically on first run.
 **Never delete `.docker/postgres-data/` on the VPS without taking a backup first.**
@@ -174,17 +174,17 @@ Both are bind-mounts. Docker creates the directories automatically on first run.
 
 ```bash
 # Start the database
-docker compose -f src/env/local/docker-compose.yml up -d
+docker compose -f env/local/docker-compose.yml up -d
 
 # Run Next.js outside Docker (fast hot-reload)
 npm run dev
 
-# Stop the database (data persists in src/env/local/postgres-data/)
-docker compose -f src/env/local/docker-compose.yml down
+# Stop the database (data persists in env/local/postgres-data/)
+docker compose -f env/local/docker-compose.yml down
 
 # Wipe local database completely
-docker compose -f src/env/local/docker-compose.yml down
-rm -rf src/env/local/postgres-data/
+docker compose -f env/local/docker-compose.yml down
+rm -rf env/local/postgres-data/
 ```
 
 ### Production deployment workflow
