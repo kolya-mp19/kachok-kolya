@@ -52,6 +52,20 @@ This version has breaking changes — APIs, conventions, and file structure may 
   - derived calculations (`useMemo`),
   - table rendering.
 
+## API Validation — Zod
+
+**Zod (`zod` v4) is the project's validation library.** It is installed and in use.
+
+- All API route request bodies **must** be validated with a Zod schema from `src/schemas/`.
+- Never write manual `typeof` / `instanceof` checks for request body fields — use `safeParse`.
+- Always infer TypeScript types from schemas: `type Foo = z.infer<typeof fooSchema>`.
+  Never write a parallel interface for a type that already has a schema.
+- Client-side files must import schema types with `import type` to prevent Zod from
+  entering the client bundle.
+- Zod v4 API note: error details live at `parsed.error.issues`, not `.errors`.
+- See `src/schemas/AGENTS.md` for the full schema catalogue and per-rule details.
+- See `docs/validation.md` for the overall strategy and examples.
+
 ## Styling Rules
 
 - Reuse existing CSS module patterns and color palette.

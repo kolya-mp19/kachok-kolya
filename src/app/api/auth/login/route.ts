@@ -5,6 +5,7 @@ import { NextResponse } from 'next/server';
 
 import { db } from '@/db';
 import { refreshTokens, users } from '@/db/schema';
+import { loginBodySchema } from '@/schemas/auth';
 import { setAuthCookies } from '@/lib/auth/cookies';
 import { hashToken } from '@/lib/auth/hash';
 import { signAccessToken, signRefreshToken } from '@/lib/auth/jwt';
@@ -17,25 +18,20 @@ const DUMMY_HASH = '$2b$12$LCkb6BpOzjJOjXyY2s6F6.Jf5tBqQ3G6m9RpVMNkXKq8Q0zOT6rO2
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
   try {
-    let body: unknown;
+    let rawBody: unknown;
     try {
-      body = await request.json();
+      rawBody = await request.json();
     } catch {
       return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
     }
 
-    if (typeof body !== 'object' || body === null) {
-      return NextResponse.json({ error: 'Request body must be an object' }, { status: 400 });
+    const parsed = loginBodySchema.safeParse(rawBody);
+    if (!parsed.success) {
+      const { message } = parsed.error.issues[0];
+      return NextResponse.json({ error: message }, { status: 400 });
     }
 
-    const { email, password } = body as Record<string, unknown>;
-
-    if (typeof email !== 'string' || email.trim().length === 0) {
-      return NextResponse.json({ error: 'Email is required' }, { status: 400 });
-    }
-    if (typeof password !== 'string' || password.length === 0) {
-      return NextResponse.json({ error: 'Password is required' }, { status: 400 });
-    }
+    const { email, password } = parsed.data;
 
     const user = await db.query.users.findFirst({
       where: eq(users.email, email.toLowerCase()),

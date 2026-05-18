@@ -123,14 +123,10 @@ export async function getMe(): Promise<User> {
   return user;
 }
 
-export interface UpdateProfilePayload {
-  name: string;
-  gender?: Gender | null;
-  password?: string;
-  confirmPassword?: string;
-}
+import type { UpdateProfileBody } from '@/schemas/auth';
+export type UpdateProfilePayload = UpdateProfileBody;
 
-export async function updateProfile(data: UpdateProfilePayload): Promise<User> {
+export async function updateProfile(data: UpdateProfileBody): Promise<User> {
   const res = await authFetch('/api/auth/me', {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
