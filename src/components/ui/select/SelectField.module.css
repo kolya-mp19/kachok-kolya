@@ -1,25 +1,31 @@
 .label {
   display: grid;
   gap: 6px;
-  color: #111827;
+  color: var(--color-text-heading);
   font-size: 14px;
   font-weight: 600;
 }
 
 .select {
-  border: 1px solid #c3cede;
+  border: 1px solid var(--color-border-input);
   border-radius: 8px;
-  padding: 8px 10px;
-  font-size: 15px;
-  background: #ffffff;
-  color: #111827;
+  padding: 12px 14px;
+  font-size: 16px;
+  min-height: 48px;
+  width: 100%;
+  background: var(--color-surface);
+  color: var(--color-text-heading);
 }
 
 .select:focus {
-  outline: 2px solid #3b82f6;
+  outline: 2px solid var(--color-focus);
   outline-offset: 1px;
 }
 
+.select:active {
+  border-color: var(--color-focus);
+}
+
 .select option {
-  color: #111827;
+  color: var(--color-text-heading);
 }

@@ -36,6 +36,10 @@ This version has breaking changes — APIs, conventions, and file structure may 
   - boolean flags start with `is/has/can` where applicable.
 - Prefer `type` aliases for local domain structures used in UI state.
 - Avoid duplicated logic; extract shared calculations into pure functions.
+- **SVG icons must never be inlined in component files.** Every SVG is a `.tsx` file in
+  `src/components/ui/icon/` that default-exports a zero-prop React function named
+  `[Name]Icon` (e.g. `CloseIcon`, `YandexIcon`). Import the component wherever the icon
+  is needed. See `src/components/ui/icon/ProgressionIcon.tsx` as the canonical example.
 
 ## Form and Validation Rules
 
@@ -64,6 +68,37 @@ This version has breaking changes — APIs, conventions, and file structure may 
 - Sorting/ranking behavior must remain predictable after UI changes.
 - Text labels should be concise and user-facing (no technical wording).
 
+## UI rules — STRICT, never violate
+
+- Mobile-first is mandatory. Every component starts with mobile layout.
+  Desktop styles are always additions via media queries in CSS modules, never the base.
+- Never write a layout without checking it at 375px width first.
+- CSS Modules media query order: base styles (mobile) → min-width: 640px → min-width: 768px → min-width: 1024px
+  Never start with max-width queries — that is desktop-first.
+
+  Correct:
+  .button { width: 100%; }
+  @media (min-width: 768px) { .button { width: auto; } }
+
+  Wrong:
+  .button { width: auto; }
+  @media (max-width: 768px) { .button { width: 100%; } }
+
+- Touch targets minimum 44×44px on all interactive elements.
+- Font sizes: minimum 16px for body text and inputs — prevents iOS auto-zoom on focus.
+- Spacing: minimum 12px padding inside tap areas, minimum 8px gap between interactive elements.
+- Forms in the gym are filled with one thumb. Input fields must be large: minimum height 48px.
+- Never use hover-only interactions. Every hover state must have an equivalent active/focus state.
+- Test mentally at 375px (iPhone SE) before suggesting any layout.
+- All colors must be defined as CSS custom properties in `src/styles/variables.css`.
+  Never use hardcoded color values in CSS modules — always reference a variable.
+  Variables are loaded globally via `globals.css`; no extra import needed in modules.
+  Use semantic names that describe PURPOSE, not appearance:
+  - Correct: `--color-text-heading`, `--color-primary`, `--color-border-input`
+  - Wrong: `--color-blue-500`, `--gray`, `--hex-111827`
+
+Full UI reference with examples: `docs/ui-rules.md`
+
 ## Testing and Verification
 
 - After substantive edits, check lints for changed files.
@@ -89,10 +124,10 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 ### Compose file layout
 
-| File | Purpose | When to use |
-|---|---|---|
-| `docker-compose.yml` (root) | Production stack: app + postgres | VPS deployment |
-| `src/env/local/docker-compose.yml` | Local DB only | Local development |
+| File                               | Purpose                          | When to use       |
+| ---------------------------------- | -------------------------------- | ----------------- |
+| `docker-compose.yml` (root)        | Production stack: app + postgres | VPS deployment    |
+| `src/env/local/docker-compose.yml` | Local DB only                    | Local development |
 
 **Key rule:** local development runs Next.js with `npm run dev` outside Docker.
 Only the database runs in Docker locally. This gives fast hot-reload without
@@ -102,34 +137,35 @@ sacrificing a consistent database environment.
 
 The application is containerized with a 3-stage Dockerfile:
 
-| Stage | Base | Purpose |
-|---|---|---|
-| `deps` | node:20-alpine | Install production `node_modules` only |
-| `builder` | node:20-alpine | Install all deps, run `npm run build` |
-| `runner` | node:20-alpine | Copy artifacts, run as non-root `nextjs` user |
+| Stage     | Base           | Purpose                                       |
+| --------- | -------------- | --------------------------------------------- |
+| `deps`    | node:20-alpine | Install production `node_modules` only        |
+| `builder` | node:20-alpine | Install all deps, run `npm run build`         |
+| `runner`  | node:20-alpine | Copy artifacts, run as non-root `nextjs` user |
 
 The final image contains only production dependencies and the `.next` build output.
 No source files, no dev dependencies, no secrets.
 
 ### Environment files
 
-| File | Committed | Loaded by | Purpose |
-|---|---|---|---|
-| `.env.example` | **yes** | — | Template; documents all variables |
-| `.env` | no | `docker-compose.yml` (env_file) | Production secrets on VPS |
-| `.env.local` | no | Next.js dev server | Local dev secrets |
+| File           | Committed | Loaded by                       | Purpose                           |
+| -------------- | --------- | ------------------------------- | --------------------------------- |
+| `.env.example` | **yes**   | —                               | Template; documents all variables |
+| `.env`         | no        | `docker-compose.yml` (env_file) | Production secrets on VPS         |
+| `.env.local`   | no        | Next.js dev server              | Local dev secrets                 |
 
 Rules:
+
 - **Never** commit `.env` or `.env.local`.
 - **Always** update `.env.example` when adding a new environment variable.
 - The `DATABASE_URL` host differs: `postgres` (Docker network) vs `localhost` (local dev).
 
 ### Database volumes
 
-| Environment | Host path | gitignored |
-|---|---|---|
-| Production | `.docker/postgres-data/` | yes |
-| Local dev | `src/env/local/postgres-data/` | yes |
+| Environment | Host path                      | gitignored |
+| ----------- | ------------------------------ | ---------- |
+| Production  | `.docker/postgres-data/`       | yes        |
+| Local dev   | `src/env/local/postgres-data/` | yes        |
 
 Both are bind-mounts. Docker creates the directories automatically on first run.
 **Never delete `.docker/postgres-data/` on the VPS without taking a backup first.**
@@ -182,13 +218,14 @@ The `app` container will not start until `postgres` passes its healthcheck.
 
 `docker-compose.yml` contains commented-out blocks ready to activate:
 
-| Service | Block label | What to also do |
-|---|---|---|
-| Redis | `redis:` | Add `REDIS_URL` to `.env.example`; update `depends_on` in `app` and `worker` |
-| Background worker | `worker:` | Create `Dockerfile.worker`; add `depends_on` postgres + redis |
-| Monitoring | `monitoring:` | Create `monitoring/prometheus.yml` |
+| Service           | Block label   | What to also do                                                              |
+| ----------------- | ------------- | ---------------------------------------------------------------------------- |
+| Redis             | `redis:`      | Add `REDIS_URL` to `.env.example`; update `depends_on` in `app` and `worker` |
+| Background worker | `worker:`     | Create `Dockerfile.worker`; add `depends_on` postgres + redis                |
+| Monitoring        | `monitoring:` | Create `monitoring/prometheus.yml`                                           |
 
 Steps to activate any service:
+
 1. Uncomment the block in `docker-compose.yml`.
 2. Add env vars to `.env.example` (with placeholder) and to `.env` on VPS.
 3. Update `depends_on` in services that need it.

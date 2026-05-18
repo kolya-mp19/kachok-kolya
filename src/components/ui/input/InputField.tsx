@@ -6,6 +6,7 @@ type InputFieldProps = {
   onChange: (value: string) => void;
   placeholder?: string;
   inputMode?: React.HTMLAttributes<HTMLInputElement>['inputMode'];
+  type?: 'text' | 'password' | 'email';
 };
 
 export default function InputField({
@@ -14,12 +15,13 @@ export default function InputField({
   onChange,
   placeholder,
   inputMode,
+  type = 'text',
 }: InputFieldProps) {
   return (
     <label className={styles.label}>
       {label}
       <input
-        type="text"
+        type={type}
         className={styles.input}
         value={value}
         onChange={(e) => onChange(e.target.value)}

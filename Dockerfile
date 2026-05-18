@@ -49,10 +49,10 @@ COPY --from=builder --chown=nextjs:nodejs /app/drizzle.config.ts ./drizzle.confi
 
 # Startup script: runs migrations then execs node server.js
 COPY --chown=nextjs:nodejs scripts/ ./scripts/
-RUN chmod +x scripts/start.sh
+RUN sed -i 's/\r//' scripts/start.sh && chmod +x scripts/start.sh
 
 USER nextjs
 
 EXPOSE 3000
 
-CMD ["scripts/start.sh"]
+CMD ["sh", "scripts/start.sh"]

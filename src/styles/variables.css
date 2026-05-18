@@ -1,0 +1,52 @@
+/*
+  Color tokens — single source of truth for all colors in the project.
+  Rules:
+  - Every color value used anywhere in CSS must be defined here.
+  - Use semantic names (what the color MEANS), never descriptive (what it LOOKS LIKE).
+  - CSS modules import these via globals.css — no direct @import needed in modules.
+*/
+
+:root {
+  /* --- Page background --- */
+  --color-bg-page-start: #f2f6ff;        /* gradient left edge */
+  --color-bg-page-end: #eefaf4;          /* gradient right edge */
+
+  /* --- Surfaces --- */
+  --color-surface: #ffffff;              /* primary surface: cards, inputs, buttons */
+  --color-surface-raised: #f8fbff;       /* slightly elevated surface (athlete card) */
+  --color-surface-table-header: #eff6ff; /* table header row background */
+  --color-surface-highlight: #fef9c3;    /* highlighted row (leaderboard leader) */
+
+  /* --- Text --- */
+  --color-text-heading: #111827;         /* h1, h2, input values, select values */
+  --color-text-body: #1f2937;            /* body text, table cells, ghost button text */
+  --color-text-label: #374151;           /* form labels */
+  --color-text-muted: #4b5563;           /* secondary / description text */
+  --color-text-placeholder: #6b7280;    /* input placeholder */
+
+  /* --- Borders --- */
+  --color-border: #d6deec;              /* container borders (cards, tables, main panel) */
+  --color-border-input: #c3cede;        /* form control borders (input, select) */
+  --color-border-row: #e2e8f0;          /* table row dividers */
+
+  /* --- Interactive / focus --- */
+  --color-focus: #3b82f6;               /* focus ring and active border on controls */
+
+  /* --- Primary action --- */
+  --color-primary: #2563eb;             /* primary button background */
+  --color-primary-text: #ffffff;        /* text on primary button */
+
+  /* --- Danger action --- */
+  --color-danger-bg: #fee2e2;           /* danger button background */
+  --color-danger-text: #b91c1c;         /* danger button text */
+
+  /* --- Ghost action --- */
+  --color-ghost-bg: #e5e7eb;            /* ghost button background */
+
+  /* --- Shadows --- */
+  --color-shadow-card: rgba(14, 42, 85, 0.08);  /* main panel drop shadow */
+  --color-shadow-btn: rgba(15, 23, 42, 0.15);   /* button hover shadow */
+
+  /* --- Overlay --- */
+  --color-overlay: rgba(0, 0, 0, 0.4);          /* sidebar backdrop */
+}
