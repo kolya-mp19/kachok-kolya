@@ -52,6 +52,20 @@ This version has breaking changes — APIs, conventions, and file structure may 
   - derived calculations (`useMemo`),
   - table rendering.
 
+## API Validation — Zod
+
+**Zod (`zod` v4) is the project's validation library.** It is installed and in use.
+
+- All API route request bodies **must** be validated with a Zod schema from `src/schemas/`.
+- Never write manual `typeof` / `instanceof` checks for request body fields — use `safeParse`.
+- Always infer TypeScript types from schemas: `type Foo = z.infer<typeof fooSchema>`.
+  Never write a parallel interface for a type that already has a schema.
+- Client-side files must import schema types with `import type` to prevent Zod from
+  entering the client bundle.
+- Zod v4 API note: error details live at `parsed.error.issues`, not `.errors`.
+- See `src/schemas/AGENTS.md` for the full schema catalogue and per-rule details.
+- See `docs/validation.md` for the overall strategy and examples.
+
 ## Styling Rules
 
 - Reuse existing CSS module patterns and color palette.
@@ -127,7 +141,7 @@ Full UI reference with examples: `docs/ui-rules.md`
 | File                               | Purpose                          | When to use       |
 | ---------------------------------- | -------------------------------- | ----------------- |
 | `docker-compose.yml` (root)        | Production stack: app + postgres | VPS deployment    |
-| `src/env/local/docker-compose.yml` | Local DB only                    | Local development |
+| `env/local/docker-compose.yml` | Local DB only                    | Local development |
 
 **Key rule:** local development runs Next.js with `npm run dev` outside Docker.
 Only the database runs in Docker locally. This gives fast hot-reload without
@@ -165,7 +179,7 @@ Rules:
 | Environment | Host path                      | gitignored |
 | ----------- | ------------------------------ | ---------- |
 | Production  | `.docker/postgres-data/`       | yes        |
-| Local dev   | `src/env/local/postgres-data/` | yes        |
+| Local dev   | `env/local/postgres-data/` | yes        |
 
 Both are bind-mounts. Docker creates the directories automatically on first run.
 **Never delete `.docker/postgres-data/` on the VPS without taking a backup first.**
@@ -174,17 +188,17 @@ Both are bind-mounts. Docker creates the directories automatically on first run.
 
 ```bash
 # Start the database
-docker compose -f src/env/local/docker-compose.yml up -d
+docker compose -f env/local/docker-compose.yml up -d
 
 # Run Next.js outside Docker (fast hot-reload)
 npm run dev
 
-# Stop the database (data persists in src/env/local/postgres-data/)
-docker compose -f src/env/local/docker-compose.yml down
+# Stop the database (data persists in env/local/postgres-data/)
+docker compose -f env/local/docker-compose.yml down
 
 # Wipe local database completely
-docker compose -f src/env/local/docker-compose.yml down
-rm -rf src/env/local/postgres-data/
+docker compose -f env/local/docker-compose.yml down
+rm -rf env/local/postgres-data/
 ```
 
 ### Production deployment workflow

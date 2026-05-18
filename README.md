@@ -71,7 +71,7 @@ cp .env.example .env.local
 # и DATABASE_URL на postgresql://kachok:kachok_dev@localhost:5432/kachok
 
 # 4. Запустить локальную базу данных
-docker compose -f src/env/local/docker-compose.yml up -d
+docker compose -f env/local/docker-compose.yml up -d
 
 # 5. Запустить dev-сервер
 npm run dev
@@ -126,34 +126,34 @@ cp .env.example .env
 
 | Окружение | Compose-файл | Запуск Next.js |
 |---|---|---|
-| Локальная разработка | `src/env/local/docker-compose.yml` | `npm run dev` (вне Docker) |
+| Локальная разработка | `env/local/docker-compose.yml` | `npm run dev` (вне Docker) |
 | Production (VPS) | `docker-compose.yml` (корень) | в Docker-контейнере |
 
 ### Локальная разработка с БД
 
 ```bash
 # Запустить только PostgreSQL в Docker
-docker compose -f src/env/local/docker-compose.yml up -d
+docker compose -f env/local/docker-compose.yml up -d
 
 # Подключиться к БД из консоли
-docker compose -f src/env/local/docker-compose.yml exec postgres \
+docker compose -f env/local/docker-compose.yml exec postgres \
   psql -U kachok -d kachok
 
-# Остановить (данные сохраняются в src/env/local/postgres-data/)
-docker compose -f src/env/local/docker-compose.yml down
+# Остановить (данные сохраняются в env/local/postgres-data/)
+docker compose -f env/local/docker-compose.yml down
 
 # Полный сброс с удалением данных
-docker compose -f src/env/local/docker-compose.yml down -v
-rm -rf src/env/local/postgres-data/
+docker compose -f env/local/docker-compose.yml down -v
+rm -rf env/local/postgres-data/
 ```
 
-Данные хранятся в `src/env/local/postgres-data/` — директория создаётся автоматически и **не коммитится**.
+Данные хранятся в `env/local/postgres-data/` — директория создаётся автоматически и **не коммитится**.
 
 ### Данные и тома (Volumes)
 
 | Окружение | Путь на хосте | Статус |
 |---|---|---|
-| Локальная разработка | `src/env/local/postgres-data/` | gitignored, создаётся автоматически |
+| Локальная разработка | `env/local/postgres-data/` | gitignored, создаётся автоматически |
 | Production (VPS) | `.docker/postgres-data/` | gitignored, создаётся автоматически |
 
 > **Важно:** Никогда не удаляй `.docker/postgres-data/` на VPS без предварительного бэкапа.
@@ -258,9 +258,9 @@ sudo ss -tlnp | grep 5432
 **Сбросить все данные локальной БД**
 
 ```bash
-docker compose -f src/env/local/docker-compose.yml down
-rm -rf src/env/local/postgres-data/
-docker compose -f src/env/local/docker-compose.yml up -d
+docker compose -f env/local/docker-compose.yml down
+rm -rf env/local/postgres-data/
+docker compose -f env/local/docker-compose.yml up -d
 ```
 
 ---

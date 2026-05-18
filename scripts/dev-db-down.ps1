@@ -1,7 +1,7 @@
 $ErrorActionPreference = 'Stop'
 
 $projectRoot = Split-Path $PSScriptRoot -Parent
-$composeFile = Join-Path $projectRoot 'src\env\local\docker-compose.yml'
+$composeFile = Join-Path $projectRoot 'env\local\docker-compose.yml'
 
 Write-Host 'Stopping local PostgreSQL...' -ForegroundColor Cyan
 docker compose -f $composeFile down

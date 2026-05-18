@@ -6,6 +6,7 @@ export interface User {
   name: string;
   gender?: Gender;
   createdAt?: string;
+  provider?: string | null;
 }
 
 export class AuthError extends Error {
@@ -117,6 +118,20 @@ export async function logout(): Promise<void> {
 
 export async function getMe(): Promise<User> {
   const res = await authFetch('/api/auth/me');
+  if (!res.ok) throw await parseErrorBody(res);
+  const { user } = (await res.json()) as { user: User };
+  return user;
+}
+
+import type { UpdateProfileBody } from '@/schemas/auth';
+export type UpdateProfilePayload = UpdateProfileBody;
+
+export async function updateProfile(data: UpdateProfileBody): Promise<User> {
+  const res = await authFetch('/api/auth/me', {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
   if (!res.ok) throw await parseErrorBody(res);
   const { user } = (await res.json()) as { user: User };
   return user;

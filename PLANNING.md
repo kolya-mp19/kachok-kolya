@@ -24,9 +24,9 @@
 - Типизация через TypeScript-интерфейсы (Athlete, Formula)
 - Настроены ESLint (flat config, @typescript-eslint) и Prettier
 - Docker + Compose (multi-stage build, non-root runner)
-- PostgreSQL 17 в Docker: production (`docker-compose.yml`) + локальная разработка (`src/env/local/docker-compose.yml`)
+- PostgreSQL 17 в Docker: production (`docker-compose.yml`) + локальная разработка (`env/local/docker-compose.yml`)
 - `.env.example` с документацией всех переменных
-- Разделённые bind-mount тома (`.docker/postgres-data/`, `src/env/local/postgres-data/`)
+- Разделённые bind-mount тома (`.docker/postgres-data/`, `env/local/postgres-data/`)
 - Drizzle ORM + drizzle-kit: схема в `src/db/schema/`, миграции в `src/db/migrations/`
 - Схема на данный момент: только таблица `users` + enum `gender`; остальные таблицы будут добавлены по мере роста фич
 

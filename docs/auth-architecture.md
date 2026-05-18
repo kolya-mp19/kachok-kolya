@@ -136,7 +136,7 @@ sequenceDiagram
     participant DB as PostgreSQL
 
     C->>S: { email, password, name, gender? }
-    S->>S: Validate input (type checks, email regex, min-length)
+    S->>S: registerBodySchema.safeParse(body) — Zod validation
     S->>DB: SELECT id FROM users WHERE email = ?
     DB-->>S: null
     S->>S: bcrypt.hash(password, rounds=12)
@@ -157,6 +157,7 @@ sequenceDiagram
     participant DB as PostgreSQL
 
     C->>S: { email, password }
+    S->>S: loginBodySchema.safeParse(body) — Zod validation
     S->>DB: SELECT * FROM users WHERE email = ?
     DB-->>S: user | null
     note over S: Always runs bcrypt.compare — uses DUMMY_HASH<br>if user not found to prevent timing oracle
@@ -409,12 +410,13 @@ Returns the authenticated user's profile. Does not attempt a token refresh.
     "email": "user@example.com",
     "name": "Alice",
     "gender": "female",
-    "createdAt": "2024-01-15T10:00:00.000Z"
+    "createdAt": "2024-01-15T10:00:00.000Z",
+    "provider": null
   }
 }
 ```
 
-`passwordHash` is never returned.
+`passwordHash` is never returned. `provider` is `null` for email+password accounts, or `"yandex"` / `"vk"` for OAuth accounts.
 
 **Error codes**
 
@@ -422,6 +424,54 @@ Returns the authenticated user's profile. Does not attempt a token refresh.
 |---|---|---|
 | 401 | `NO_TOKEN` | Cookie absent |
 | 401 | `INVALID_TOKEN` | JWT expired or signature invalid |
+| 500 | — | Unexpected server error |
+
+---
+
+### `PATCH /api/auth/me`
+
+Updates the authenticated user's profile. Requires `access_token` cookie.
+
+**Request body**
+
+```json
+{
+  "name": "Alice",
+  "gender": "female",
+  "password": "newpassword",
+  "confirmPassword": "newpassword"
+}
+```
+
+`gender` is optional (pass `null` to clear). `password` + `confirmPassword` are optional and only
+processed for users without a provider (`provider === null`). Minimum password length: 8. Both
+fields must match.
+
+**Validation:** `updateProfileBodySchema` (Zod) — `name` must be non-empty.
+
+**Response `200`**
+
+```json
+{
+  "user": {
+    "id": "<uuid>",
+    "email": "user@example.com",
+    "name": "Alice",
+    "gender": "female",
+    "createdAt": "2024-01-15T10:00:00.000Z",
+    "provider": null
+  }
+}
+```
+
+**Error codes**
+
+| Status | `code` | Reason |
+|---|---|---|
+| 400 | — | Validation error (empty name, password mismatch, etc.) |
+| 401 | `NO_TOKEN` | Cookie absent |
+| 401 | `INVALID_TOKEN` | JWT expired or signature invalid |
+| 404 | — | User not found |
 | 500 | — | Unexpected server error |
 
 ---
@@ -495,6 +545,10 @@ a stable placeholder address `vk_<user_id>@vk.placeholder.local`.
 src/
 ├── middleware.ts                    # Edge middleware: JWT check, redirects /profile and /dashboard to / on failure
 │
+├── schemas/
+│   └── auth.ts                      # Zod schemas: registerBodySchema, loginBodySchema, updateProfileBodySchema
+│                                    # All API body types are inferred from these with z.infer<>
+│
 ├── lib/
 │   └── auth/
 │       ├── jwt.ts                   # signAccessToken, signRefreshToken, verifyAccessToken, verifyRefreshToken, JwtPayload
@@ -521,7 +575,8 @@ src/
             ├── logout/
             │   └── route.ts         # POST — delete all user refresh tokens, clear cookies
             ├── me/
-            │   └── route.ts         # GET — verify access token, return user without passwordHash
+            │   └── route.ts         # GET — verify access token, return user (id, email, name, gender, createdAt, provider)
+            │                        # PATCH — update name, gender; change password (own-account users only)
             ├── yandex/
             │   ├── route.ts         # GET — generate state, redirect to oauth.yandex.ru/authorize
             │   └── callback/

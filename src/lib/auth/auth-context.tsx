@@ -18,11 +18,13 @@ import {
   login as apiLogin,
   logout as apiLogout,
   register as apiRegister,
+  updateProfile as apiUpdateProfile,
   type Gender,
+  type UpdateProfilePayload,
   type User,
 } from './auth-client';
 
-export type { Gender, User };
+export type { Gender, UpdateProfilePayload, User };
 export { AuthError };
 
 interface AuthState {
@@ -32,6 +34,7 @@ interface AuthState {
   login: (email: string, password: string) => Promise<void>;
   register: (email: string, password: string, name: string, gender?: Gender) => Promise<void>;
   logout: () => Promise<void>;
+  updateProfile: (data: UpdateProfilePayload) => Promise<void>;
   clearError: () => void;
 }
 
@@ -117,11 +120,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [router]);
 
+  const updateProfile = useCallback(async (data: UpdateProfilePayload) => {
+    setError(null);
+    try {
+      const u = await apiUpdateProfile(data);
+      setUser(u);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Update failed';
+      setError(msg);
+      throw err;
+    }
+  }, []);
+
   const clearError = useCallback(() => setError(null), []);
 
   const value = useMemo<AuthState>(
-    () => ({ user, isLoading, error, login, register, logout, clearError }),
-    [user, isLoading, error, login, register, logout, clearError],
+    () => ({ user, isLoading, error, login, register, logout, updateProfile, clearError }),
+    [user, isLoading, error, login, register, logout, updateProfile, clearError],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
