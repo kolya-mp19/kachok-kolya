@@ -28,7 +28,8 @@
       "Bash(Get-ChildItem -Path \"d:\\\\projects\\\\kachok-kolya\\\\src\\\\db\" -Recurse)",
       "Bash(Select-Object -ExpandProperty FullName)",
       "Bash(Get-ChildItem -Force)",
-      "Bash(xargs ls -la)"
+      "Bash(xargs ls -la)",
+      "Bash(npx eslint *)"
     ]
   }
 }

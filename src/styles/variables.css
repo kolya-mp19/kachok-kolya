@@ -49,4 +49,41 @@
 
   /* --- Overlay --- */
   --color-overlay: rgba(0, 0, 0, 0.4);          /* sidebar backdrop */
+
+  /* --- Status --- */
+  --color-status-done-bg:     #dcfce7;
+  --color-status-done-text:   #14532d;
+  --color-status-done-border: #86efac;
+
+  --color-status-planned-bg:     #dbeafe;
+  --color-status-planned-text:   #1e40af;
+  --color-status-planned-border: #93c5fd;
+
+  --color-status-skipped-bg:     #fee2e2;
+  --color-status-skipped-text:   #991b1b;
+  --color-status-skipped-border: #fca5a5;
+
+  --color-status-warn-bg:     #fef3c7;
+  --color-status-warn-text:   #92400e;
+  --color-status-warn-border: #fde68a;
+
+  /* --- RPE --- */
+  --color-rpe-easy-bg:   #dcfce7;
+  --color-rpe-easy-text: #14532d;
+  --color-rpe-mid-bg:    #fef3c7;
+  --color-rpe-mid-text:  #92400e;
+  --color-rpe-hard-bg:   #fee2e2;
+  --color-rpe-hard-text: #991b1b;
+
+  /* --- Athlete --- */
+  --color-set-done-bg:    #f0fdf4;   /* completed set row — background tint */
+  --color-set-done-text:  #15803d;   /* completed set row — text */
+  --color-history-bg:     #f8fafc;   /* past-week feed card background */
+  --color-history-border: #e2e8f0;   /* past-week feed card border */
+
+  /* --- Slot bar --- */
+  --color-slot-done:    #16a34a;
+  --color-slot-planned: #93c5fd;
+  --color-slot-skipped: #fca5a5;
+  --color-slot-empty:   var(--color-border);
 }
