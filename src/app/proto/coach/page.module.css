@@ -1,0 +1,928 @@
+/* ── Page shell ─────────────────────────────────────────────── */
+.page {
+  min-height: calc(100dvh - 52px);
+  background: linear-gradient(135deg, var(--color-bg-page-start), var(--color-bg-page-end));
+  padding: 16px 12px 80px;
+}
+
+@media (min-width: 768px) {
+  .page {
+    padding: 24px 24px 60px;
+  }
+}
+
+/* ── Breadcrumb ─────────────────────────────────────────────── */
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--color-text-muted);
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.breadcrumbLink {
+  color: var(--color-primary);
+  cursor: pointer;
+  background: none;
+  border: none;
+  font-size: 12px;
+  padding: 0;
+}
+
+.breadcrumbLink:hover {
+  text-decoration: underline;
+}
+
+.breadcrumbSep {
+  width: 12px;
+  height: 12px;
+  color: var(--color-text-muted);
+  flex-shrink: 0;
+}
+
+/* ── Page header ────────────────────────────────────────────── */
+.pageHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.pageHeaderLeft {
+  flex: 1;
+}
+
+.pageTitle {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--color-text-heading);
+  line-height: 1.2;
+}
+
+@media (min-width: 768px) {
+  .pageTitle {
+    font-size: 24px;
+  }
+}
+
+.pageSub {
+  font-size: 13px;
+  color: var(--color-text-muted);
+  margin-top: 4px;
+}
+
+/* ── Legend row ─────────────────────────────────────────────── */
+.legend {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.dotPlanned { color: var(--color-slot-planned); }
+.dotDone    { color: var(--color-slot-done); }
+.dotSkipped { color: var(--color-slot-skipped); }
+.dotEmpty   { color: var(--color-border); }
+
+/* ── Athlete grid ───────────────────────────────────────────── */
+.athleteGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+@media (min-width: 640px) {
+  .athleteGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .athleteGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* ── AthleteCard ────────────────────────────────────────────── */
+.athleteCard {
+  background: var(--color-surface);
+  border: 0.5px solid var(--color-border);
+  border-radius: 14px;
+  padding: 12px;
+  cursor: pointer;
+  transition: border-color 0.15s, transform 0.15s;
+}
+
+.athleteCard:hover {
+  border-color: var(--color-status-planned-border);
+  transform: translateY(-1px);
+}
+
+.athleteCard:active {
+  transform: translateY(0);
+}
+
+.athTop {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.avatarBlue   { background: #dbeafe; color: #1e40af; }
+.avatarGreen  { background: #dcfce7; color: #14532d; }
+.avatarAmber  { background: #fef3c7; color: #92400e; }
+.avatarPink   { background: #fce7f3; color: #9d174d; }
+.avatarPurple { background: #ede9fe; color: #5b21b6; }
+
+.athInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.athName {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text-heading);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.athSport {
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+/* ── SlotBar ────────────────────────────────────────────────── */
+.slotBar {
+  display: flex;
+  gap: 5px;
+  margin-bottom: 10px;
+}
+
+.slotStrip {
+  flex: 1;
+  height: 6px;
+  border-radius: 3px;
+}
+
+.slotDone    { background: var(--color-slot-done); }
+.slotPlanned { background: var(--color-slot-planned); }
+.slotSkipped { background: var(--color-slot-skipped); }
+.slotEmpty   { background: var(--color-slot-empty); }
+
+/* ── Athlete meta row ───────────────────────────────────────── */
+.athMeta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--color-text-muted);
+  flex-wrap: wrap;
+}
+
+.athMetaIcon {
+  width: 13px;
+  height: 13px;
+  flex-shrink: 0;
+}
+
+.athMetaSep {
+  opacity: 0.5;
+}
+
+.athMetaWarn { color: var(--color-status-warn-text); }
+.athMetaOk   { color: var(--color-slot-done); }
+
+/* ── StatusBadge ────────────────────────────────────────────── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 8px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.badgeDone    { background: var(--color-status-done-bg);    color: var(--color-status-done-text); }
+.badgePlanned { background: var(--color-status-planned-bg); color: var(--color-status-planned-text); }
+.badgeSkipped { background: var(--color-status-skipped-bg); color: var(--color-status-skipped-text); }
+.badgeWarn    { background: var(--color-status-warn-bg);    color: var(--color-status-warn-text); }
+
+/* ── Athlete page header ────────────────────────────────────── */
+.athletePageHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.avatarMd {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.athletePageInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.athletePageName {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-text-heading);
+}
+
+.athletePageMeta {
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.athletePageActions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* ── WeekNav ────────────────────────────────────────────────── */
+.weekNav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.weekNavBtn {
+  width: 28px;
+  height: 28px;
+  min-width: 44px;
+  min-height: 44px;
+  background: var(--color-surface-raised);
+  border: 0.5px solid var(--color-border);
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-body);
+  transition: background 0.15s;
+}
+
+.weekNavBtn:hover {
+  background: var(--color-ghost-bg);
+}
+
+.weekNavBtn:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.weekNavLabel {
+  flex: 1;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-heading);
+  text-align: center;
+}
+
+/* ── WorkoutSlotCard ────────────────────────────────────────── */
+.slotList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.slotCard {
+  background: var(--color-surface);
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.slotCardPlanned { border: 0.5px solid var(--color-border); }
+.slotCardDone    { border: 0.5px solid var(--color-status-done-border); }
+.slotCardSkipped { border: 0.5px solid var(--color-status-skipped-border); }
+
+.slotHead {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-bottom: 0.5px solid var(--color-border);
+}
+
+.slotNum {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.slotNumPlanned { background: var(--color-status-planned-bg); color: var(--color-status-planned-text); }
+.slotNumDone    { background: var(--color-status-done-bg);    color: var(--color-status-done-text); }
+.slotNumSkipped { background: var(--color-status-skipped-bg); color: var(--color-status-skipped-text); }
+
+.slotTitle {
+  flex: 1;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-heading);
+  min-width: 0;
+}
+
+.slotAthleteDay {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+
+.slotAthleteDayDone    { color: var(--color-slot-done); }
+.slotAthleteDayPlanned { color: var(--color-text-muted); }
+.slotAthleteDaySkipped { color: var(--color-status-skipped-text); }
+
+.slotBody {
+  padding: 10px 14px;
+}
+
+.exerciseRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 0;
+  border-bottom: 0.5px solid var(--color-border-row);
+}
+
+.exerciseRow:last-child {
+  border-bottom: none;
+}
+
+.exerciseName {
+  flex: 1;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--color-text-body);
+}
+
+.exerciseParams {
+  font-size: 11px;
+  color: var(--color-text-muted);
+}
+
+.exerciseParamsVal {
+  font-weight: 600;
+  color: var(--color-text-body);
+}
+
+.slotFooter {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-top: 0.5px solid var(--color-border);
+}
+
+.slotNote {
+  flex: 1;
+  font-size: 11px;
+  color: var(--color-text-muted);
+  font-style: italic;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  max-width: 160px;
+}
+
+.slotActions {
+  margin-left: auto;
+  display: flex;
+  gap: 6px;
+}
+
+/* ── RpeChip ────────────────────────────────────────────────── */
+.rpeChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 20px;
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.rpeEasy { background: var(--color-rpe-easy-bg); color: var(--color-rpe-easy-text); }
+.rpeMid  { background: var(--color-rpe-mid-bg);  color: var(--color-rpe-mid-text); }
+.rpeHard { background: var(--color-rpe-hard-bg); color: var(--color-rpe-hard-text); }
+
+/* ── Small action buttons ───────────────────────────────────── */
+.btnSm {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  min-height: 32px;
+  transition: background 0.15s, box-shadow 0.15s;
+}
+
+.btnSm:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.btnSmGhost {
+  background: var(--color-ghost-bg);
+  color: var(--color-text-body);
+}
+
+.btnSmGhost:hover {
+  background: var(--color-border);
+}
+
+.btnSmDanger {
+  background: var(--color-danger-bg);
+  color: var(--color-danger-text);
+}
+
+.btnSmDanger:hover {
+  box-shadow: 0 2px 8px var(--color-shadow-btn);
+}
+
+.btnSmPrimary {
+  background: var(--color-primary);
+  color: var(--color-primary-text);
+  font-weight: 600;
+}
+
+.btnSmPrimary:hover {
+  box-shadow: 0 4px 10px var(--color-shadow-btn);
+}
+
+.btnSmPrimary:disabled {
+  opacity: 0.4;
+  cursor: default;
+  box-shadow: none;
+}
+
+/* ── Primary btn full ───────────────────────────────────────── */
+.btnPrimary {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 18px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  min-height: 44px;
+  background: var(--color-primary);
+  color: var(--color-primary-text);
+  transition: box-shadow 0.15s, transform 0.15s;
+  white-space: nowrap;
+}
+
+.btnPrimary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 14px var(--color-shadow-btn);
+}
+
+.btnPrimary:active {
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+.btnPrimary:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.btnPrimary:disabled {
+  opacity: 0.4;
+  cursor: default;
+  transform: none;
+  box-shadow: none;
+}
+
+.btnGhost {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 18px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid var(--color-border-input);
+  min-height: 44px;
+  background: var(--color-surface);
+  color: var(--color-text-body);
+  transition: background 0.15s;
+  white-space: nowrap;
+}
+
+.btnGhost:hover {
+  background: var(--color-ghost-bg);
+}
+
+.btnGhost:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+/* ── Add workout dashed button ──────────────────────────────── */
+.addSlotBtn {
+  width: 100%;
+  padding: 10px;
+  border: 1.5px dashed var(--color-border-input);
+  border-radius: 14px;
+  background: transparent;
+  color: var(--color-primary);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  min-height: 44px;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.addSlotBtn:hover {
+  background: var(--color-surface-raised);
+  border-color: var(--color-status-planned-border);
+}
+
+.addSlotBtn:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+/* ── Week summary bar ───────────────────────────────────────── */
+.weekSummary {
+  background: var(--color-surface-raised);
+  border-radius: 10px;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-size: 12px;
+  flex-wrap: wrap;
+  border: 0.5px solid var(--color-border);
+  margin-top: 16px;
+}
+
+.summaryItem {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--color-text-muted);
+}
+
+.summaryIcon {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+.summaryIconGreen { color: var(--color-slot-done); }
+.summaryIconMuted { color: var(--color-text-muted); }
+.summaryIconBlue  { color: var(--color-primary); }
+
+.summaryRight {
+  margin-left: auto;
+}
+
+/* ── Copy week screen ───────────────────────────────────────── */
+.infoBanner {
+  display: flex;
+  gap: 10px;
+  background: var(--color-surface-raised);
+  border: 1.5px solid var(--color-status-planned-border);
+  border-radius: 14px;
+  padding: 12px 16px;
+  margin-bottom: 20px;
+}
+
+.infoBannerIcon {
+  width: 20px;
+  height: 20px;
+  color: var(--color-primary);
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.infoBannerTitle {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-status-planned-text);
+  margin-bottom: 2px;
+}
+
+.infoBannerBody {
+  font-size: 11px;
+  color: var(--color-primary);
+}
+
+.sectionLabel {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-label);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 10px;
+}
+
+/* ── WeekHistoryCard ────────────────────────────────────────── */
+.weekHistoryList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.weekHistoryCard {
+  border-radius: 14px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: border-color 0.15s;
+  background: var(--color-surface);
+}
+
+.weekHistoryCardDefault  { border: 0.5px solid var(--color-border); }
+.weekHistoryCardSelected { border: 1.5px solid var(--color-primary); background: var(--color-surface-raised); }
+
+.weekHistoryCard:hover:not(.weekHistoryCardSelected) {
+  border-color: var(--color-status-planned-border);
+}
+
+.weekHistoryHead {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+}
+
+.weekHistoryTitle {
+  flex: 1;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-heading);
+}
+
+.weekHistoryPreview {
+  padding: 8px 14px;
+  border-top: 0.5px solid var(--color-border-row);
+  font-size: 11px;
+  color: var(--color-text-muted);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* ── Copy footer ────────────────────────────────────────────── */
+.copyFooter {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+/* ── Drawer ─────────────────────────────────────────────────── */
+.drawerOverlay {
+  position: fixed;
+  inset: 0;
+  background: var(--color-overlay);
+  z-index: 300;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.drawer {
+  width: 100%;
+  max-width: 420px;
+  height: 100%;
+  background: var(--color-surface);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.drawerHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--color-border);
+  flex-shrink: 0;
+}
+
+.drawerTitle {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-text-heading);
+}
+
+.drawerClose {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 6px;
+  color: var(--color-text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  transition: background 0.15s;
+}
+
+.drawerClose:hover {
+  background: var(--color-ghost-bg);
+}
+
+.drawerBody {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.drawerFooter {
+  display: flex;
+  gap: 10px;
+  padding: 16px 20px;
+  border-top: 1px solid var(--color-border);
+  flex-shrink: 0;
+}
+
+/* ── Form fields in drawer ──────────────────────────────────── */
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.formLabel {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-label);
+}
+
+.formInput {
+  border: 1px solid var(--color-border-input);
+  border-radius: 8px;
+  padding: 12px 14px;
+  font-size: 16px;
+  min-height: 48px;
+  width: 100%;
+  background: var(--color-surface);
+  color: var(--color-text-heading);
+}
+
+.formInput::placeholder {
+  color: var(--color-text-placeholder);
+}
+
+.formInput:focus {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 1px;
+}
+
+.exerciseFormRow {
+  background: var(--color-surface-raised);
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin-bottom: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.exerciseFormFields {
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+}
+
+.formInputSm {
+  border: 1px solid var(--color-border-input);
+  border-radius: 8px;
+  padding: 10px 8px;
+  font-size: 14px;
+  min-height: 44px;
+  background: var(--color-surface);
+  color: var(--color-text-heading);
+  width: 100%;
+}
+
+.formInputSm:focus {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 1px;
+}
+
+.exerciseFormSetsReps {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.exerciseFormSetsRepsField {
+  width: 60px;
+  flex-shrink: 0;
+}
+
+.exerciseMult {
+  font-size: 14px;
+  color: var(--color-text-muted);
+}
+
+.exerciseRemoveBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  color: var(--color-text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  min-height: 32px;
+  transition: color 0.15s;
+  align-self: flex-start;
+}
+
+.exerciseRemoveBtn:hover {
+  color: var(--color-danger-text);
+}
+
+.addExerciseBtn {
+  width: 100%;
+  padding: 7px;
+  border: 1.5px dashed var(--color-border-input);
+  border-radius: 10px;
+  background: transparent;
+  color: var(--color-primary);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  min-height: 44px;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.addExerciseBtn:hover {
+  background: var(--color-surface-raised);
+  border-color: var(--color-status-planned-border);
+}
+
+/* ── SVG icon size helper ───────────────────────────────────── */
+.icon14 { width: 14px; height: 14px; }
+.icon16 { width: 16px; height: 16px; }
+.icon18 { width: 18px; height: 18px; }
