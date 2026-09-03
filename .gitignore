@@ -30,14 +30,8 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files — secrets must never be committed
+# env files (can opt-in for committing if needed)
 .env*
-# but the example template is safe to commit
-!.env.example
-
-# Docker local volume data — generated at runtime, can be large
-.docker/
-src/env/local/postgres-data/
 
 # vercel
 .vercel

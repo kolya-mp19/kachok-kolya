@@ -1,6 +1,0 @@
-{
-  "cSpell.words": ["WILKS", "Прогрессия"],
-  "editor.formatOnSave": true,
-  "editor.defaultFormatter": "esbenp.prettier-vscode",
-  "eslint.validate": ["typescript", "typescriptreact"]
-}
