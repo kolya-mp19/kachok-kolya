@@ -1,6 +1,6 @@
 ---
-version: 2
-last_updated: 2026-09-14
+version: 3
+last_updated: 2026-09-24
 ---
 
 # Регистрация и вход — открытые вопросы
@@ -27,5 +27,4 @@ last_updated: 2026-09-14
 ## 3. Связанные документы
 
 - [index.md](index.md) — спека фичи
-- [shared-access](../shared-access/index.md) — совместный доступ, затрагивается AUTH-Q1
-- [ADR-0012](../../architecture/adr/ADR-0012-coach-is-permission-not-role.md) — тренер как право доступа
+- [`../../backlog.md`](../../backlog.md) — удаление аккаунта и совместный доступ
