@@ -26,7 +26,7 @@
   развивающий, а тот, где этот принцип виден в чистом виде.
 - Изменчивый состав упражнений от недели к неделе — нормальное состояние **новичка**, но не цель.
   Продукт помогает его нащупать и затем — зафиксировать.
-- Метрика, которая растёт от лишней работы, продукту не подходит в принципе (см. П3 и ADR-0003).
+- Метрика, которая растёт от лишней работы, продукту не подходит в принципе (см. П3 и [ADR-0003](architecture/adr/ADR-0003-no-tonnage-no-estimated-1rm.md)).
 
 ## П2. Цикл важнее недели, неделя важнее тренировки
 
@@ -74,7 +74,7 @@
 
 > **В первой версии реакции на перевыполнение нет.** Принцип остаётся позицией продукта — на нём
 > стоят точность плана и отказ от тоннажа, — но пометки, индикатор и предупреждение отложены:
-> см. `docs/backlog.md`, «Реакция на перевыполнение плана».
+> см. [backlog.md](backlog.md), «Реакция на перевыполнение плана».
 
 ## П4. Мобильный браузер — единственный проектный ориентир
 
@@ -95,3 +95,12 @@
 Каждая спека фичи, принимая решение о том, что показать и как отреагировать, ссылается
 на конкретный принцип. Если решение не выводится ни из одного из них — либо решение лишнее,
 либо принципы неполны и их надо дополнить здесь, а не обойти на месте.
+
+## Где принципы воплощены
+
+| Принцип | Решения | Спеки, где он работает сильнее всего |
+|---|---|---|
+| П1 | [ADR-0003](architecture/adr/ADR-0003-no-tonnage-no-estimated-1rm.md), [ADR-0013](architecture/adr/ADR-0013-not-every-cycle-targets-growth.md) | [cycle](requirements/cycle/index.md), [progress-analytics](requirements/progress-analytics/index.md), [warmup](requirements/warmup/index.md) |
+| П2 | [ADR-0001](architecture/adr/ADR-0001-cycle-over-plan.md) | [cycle](requirements/cycle/index.md), [workout-execution](requirements/workout-execution/index.md) |
+| П3 | [ADR-0002](architecture/adr/ADR-0002-overperformance-is-negative.md) — реализация отложена | [backlog.md](backlog.md), «Реакция на перевыполнение плана» |
+| П4 | [ADR-0012](architecture/adr/ADR-0012-mobile-only-design-target.md), [ADR-0006](architecture/adr/ADR-0006-structured-plan-not-text.md) | [week-planning](requirements/week-planning/index.md), [workout-execution](requirements/workout-execution/index.md) |
