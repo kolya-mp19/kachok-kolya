@@ -22,7 +22,7 @@ async function bootstrap() {
         next();
         return;
       }
-      res.sendFile(resolve(webRoot, 'index.html'));
+      res.sendFile('index.html', { root: webRoot });
     });
   }
   await app.listen(port, '127.0.0.1');
