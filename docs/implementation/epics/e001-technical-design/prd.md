@@ -50,6 +50,9 @@
 
 ### Проектные результаты
 
+- [Доступ и границы доверия](./design/access-and-trust.md): сессии PostgreSQL,
+  Яндекс/VK ID, почта, явное подключение и восстановление одного дневника.
+
 - [Техническая основа](./design/technology-stack.md), [исследование](./design/technology-research.md),
   [ADR-0020](../../../architecture/adr/ADR-0020-javascript-modular-monolith.md).
 
