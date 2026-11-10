@@ -130,6 +130,12 @@
 [ADR-0020](../../../architecture/adr/ADR-0020-javascript-modular-monolith.md),
 [ADR-0021](../../../architecture/adr/ADR-0021-durable-drafts-and-operation-receipts.md).
 
+## Мобильный проект E002
+
+[Первый дневник E002](../e002-mobile-experience/design/first-manual-plan.md) задаёт пустое состояние, положение в цикле выше тренировки и явные переходы между контекстами; калькулятор не проверяет сессию.
+
+Схемы не заменяют проверку работающего интерфейса в целевых браузерах.
+
 ## Связанные документы
 
 - [Карточка эпика](./README.md), [реестр](../README.md), [общий план](../../README.md)

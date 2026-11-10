@@ -126,6 +126,12 @@
 [ADR-0020](../../../architecture/adr/ADR-0020-javascript-modular-monolith.md),
 [ADR-0021](../../../architecture/adr/ADR-0021-durable-drafts-and-operation-receipts.md).
 
+## Мобильный проект E002
+
+[Первый цикл E002](../e002-mobile-experience/design/first-manual-plan.md) показывает выбор шаблона, будущий старт и ручной план без МПВ. [Итоги](../e002-mobile-experience/design/results-and-analytics.md) задают явный переход к следующему циклу, пересмотр МПВ и полноценный поддерживающий сценарий.
+
+Схемы не заменяют проверку работающего интерфейса в целевых браузерах.
+
 ## Связанные документы
 
 - [Карточка эпика](./README.md), [E016](../e016-plan-entry/README.md), [E017](../e017-plan-management/README.md)

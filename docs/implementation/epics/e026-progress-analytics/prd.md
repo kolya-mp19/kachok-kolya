@@ -136,6 +136,12 @@ E013 передаёт правила принадлежности при пер�
 [ADR-0020](../../../architecture/adr/ADR-0020-javascript-modular-monolith.md),
 [ADR-0021](../../../architecture/adr/ADR-0021-durable-drafts-and-operation-receipts.md).
 
+## Мобильный проект E002
+
+[Динамика E002](../e002-mobile-experience/design/results-and-analytics.md) задаёт отдельный график упражнения, список источников и текстовую отметку смены зала. Регулярность, точность плана и целостность цикла не объединяются в одну оценку.
+
+Схемы не заменяют проверку работающего интерфейса в целевых браузерах.
+
 ## Связанные документы
 
 - [Карточка эпика](./README.md), [E024](../e024-cycle-metrics/README.md), [E025](../e025-cycle-results/README.md)

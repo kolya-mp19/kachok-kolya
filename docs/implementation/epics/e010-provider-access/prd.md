@@ -131,6 +131,12 @@ provider/subject. Совпадение почты не авторизует и �
 [ADR-0020](../../../architecture/adr/ADR-0020-javascript-modular-monolith.md),
 [ADR-0021](../../../architecture/adr/ADR-0021-durable-drafts-and-operation-receipts.md).
 
+## Мобильный проект E002
+
+[Схемы входа E002](../e002-mobile-experience/design/first-manual-plan.md) различают вход и явное подключение нового способа; занятая почта ведёт к прежнему входу или восстановлению, отмена не меняет связей.
+
+Схемы не заменяют проверку работающего интерфейса в целевых браузерах.
+
 ## Связанные документы
 
 - [Карточка эпика](./README.md), [реестр](../README.md), [общий план](../../README.md)

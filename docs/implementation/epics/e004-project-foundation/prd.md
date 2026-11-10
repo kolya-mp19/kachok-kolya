@@ -119,7 +119,21 @@ TypeScript, React SPA/Vite, NestJS, Ant Design и Tailwind CSS. Калькуля
 [ADR-0020](../../../architecture/adr/ADR-0020-javascript-modular-monolith.md),
 [ADR-0021](../../../architecture/adr/ADR-0021-durable-drafts-and-operation-receipts.md).
 
-## 9. Связанные документы
+## 9. Мобильные входы E002
+
+Оболочка следует [карте и передаче E002](../e002-mobile-experience/design/design-handoff.md).
+[Визуальный язык](../e002-mobile-experience/design/calculator-and-visual-language.md) задаёт типографику, интервалы, касания, фокус и состояния; тема Ant Design настраивается токенами, Tailwind отвечает за компоновку.
+[Первый вход](../e002-mobile-experience/design/first-manual-plan.md) задаёт явный переход
+из калькулятора, возвраты и иерархию главного экрана. Общий UI не проверяет сессию на
+странице калькулятора и не переносит между контекстами собственный вес.
+
+[Мобильные условия](../e002-mobile-experience/design/constraints-and-validation.md)
+задают Safari iOS и Chrome Android, ширины 320/360/390 CSS-пикселей и тесную видимую
+область с клавиатурой. Минимумы выбранных версий Ant Design и Tailwind сверяются с
+этой матрицей до установки. Фактическая совместимость подтверждается на реализации;
+проектный проход схем её не заменяет. Готовность E002 не завершает E003 и весь S01.
+
+## 10. Связанные документы
 
 - [Карточка эпика](./README.md)
 - [ADR-0009](../../../architecture/adr/ADR-0009-calculator-is-separate-context.md)

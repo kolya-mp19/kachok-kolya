@@ -7,9 +7,9 @@
 
 ## Текущая точка
 
-- PRD подготовлен; проектирование и реализация эпика не начаты.
-- Активной задачи нет; разбивка согласована, создано задач: 6.
-- Следующее действие: начать [E002-T001](./tasks/t001-first-manual-plan.md) — спроектировать вход и первый ручной план без МПВ.
+- Проектные результаты всех шести задач подготовлены и сведены в [передаче E002](./design/design-handoff.md).
+- Активной задачи нет; сценарная проверка, проверка ссылок и независимый review стандартов и требований завершены.
+- Следующее действие: выполнить оставшиеся задачи [E003](../e003-release-design/README.md) до завершения S01. Мобильные условия и результаты E002 переданы в зависимые PRD; фактическая проверка приложения выполняется после реализации.
 
 ## Зависимости и результат
 
@@ -18,7 +18,7 @@
 в [E003](../e003-release-design/README.md) в рамках S01.
 Входы — [принципы](../../../principles.md) и [бизнес-спеки](../../../requirements/README.md).
 
-Результат — карта мобильных экранов и переходов, состояния ввода и описание визуального
+Результат — [карта мобильных экранов и передача](./design/design-handoff.md), состояния ввода и описание визуального
 языка для реализации в S02–S10. Технологии интерфейса здесь не выбираются:
 стек согласуется с владельцем продукта в E001 до создания проекта и установки зависимостей.
 
@@ -30,9 +30,9 @@
 
 | Готово | Задача | Статус | Заблокирована |
 |---|---|---|---|
-| [ ] | [E002-T001. Спроектировать вход и первый ручной план без МПВ](./tasks/t001-first-manual-plan.md) | Не начат | нет; границы уточняются совместно с [E001-T001](../e001-technical-design/tasks/t001-constraints.md)/[E001-T002](../e001-technical-design/tasks/t002-manual-plan-and-fact.md) без ожидания завершения E001. |
-| [ ] | [E002-T002. Спроектировать быстрый ввод и дополнение плана](./tasks/t002-quick-entry.md) | Не начат | [E002-T001](tasks/t001-first-manual-plan.md) — точка входа в планирование. |
-| [ ] | [E002-T003. Спроектировать разминку, отметку подхода и исправление истории](./tasks/t003-warmup-and-history.md) | Не начат | [E002-T002](tasks/t002-quick-entry.md); проект фиксации плана и исторических условий из [E001-T002](../e001-technical-design/tasks/t002-manual-plan-and-fact.md)/[E001-T004](../e001-technical-design/tasks/t004-history-recalculation.md). |
-| [ ] | [E002-T004. Спроектировать сохранность ввода при сбоях](./tasks/t004-input-preservation.md) | Не начат | [E002-T003](tasks/t003-warmup-and-history.md); протокол сохранности [E001-T007](../e001-technical-design/tasks/t007-input-preservation.md). |
-| [ ] | [E002-T005. Спроектировать итоги, следующий цикл и динамику](./tasks/t005-results-and-analytics.md) | Не начат | [E002-T001](tasks/t001-first-manual-plan.md); проект календаря и пересчётов [E001-T003](../e001-technical-design/tasks/t003-calendar-and-interruption.md)/[E001-T004](../e001-technical-design/tasks/t004-history-recalculation.md). |
-| [ ] | [E002-T006. Спроектировать страницу калькулятора и проверить общий визуальный язык](./tasks/t006-calculator-and-visual-language.md) | Не начат | [E002-T002](tasks/t002-quick-entry.md), [E002-T003](tasks/t003-warmup-and-history.md), [E002-T004](tasks/t004-input-preservation.md), [E002-T005](tasks/t005-results-and-analytics.md); от E003 требуется согласованный перечень мобильных браузеров и условий приёмки, а не завершение E003 целиком. |
+| [x] | [E002-T001. Спроектировать вход и первый ручной план без МПВ](./tasks/t001-first-manual-plan.md) | Готов | нет; границы уточняются совместно с [E001-T001](../e001-technical-design/tasks/t001-constraints.md)/[E001-T002](../e001-technical-design/tasks/t002-manual-plan-and-fact.md) без ожидания завершения E001. |
+| [x] | [E002-T002. Спроектировать быстрый ввод и дополнение плана](./tasks/t002-quick-entry.md) | Готов | [E002-T001](tasks/t001-first-manual-plan.md) — точка входа в планирование. |
+| [x] | [E002-T003. Спроектировать разминку, отметку подхода и исправление истории](./tasks/t003-warmup-and-history.md) | Готов | [E002-T002](tasks/t002-quick-entry.md); проект фиксации плана и исторических условий из [E001-T002](../e001-technical-design/tasks/t002-manual-plan-and-fact.md)/[E001-T004](../e001-technical-design/tasks/t004-history-recalculation.md). |
+| [x] | [E002-T004. Спроектировать сохранность ввода при сбоях](./tasks/t004-input-preservation.md) | Готов | [E002-T003](tasks/t003-warmup-and-history.md); протокол сохранности [E001-T007](../e001-technical-design/tasks/t007-input-preservation.md). |
+| [x] | [E002-T005. Спроектировать итоги, следующий цикл и динамику](./tasks/t005-results-and-analytics.md) | Готов | [E002-T001](tasks/t001-first-manual-plan.md); проект календаря и пересчётов [E001-T003](../e001-technical-design/tasks/t003-calendar-and-interruption.md)/[E001-T004](../e001-technical-design/tasks/t004-history-recalculation.md). |
+| [x] | [E002-T006. Спроектировать страницу калькулятора и проверить общий визуальный язык](./tasks/t006-calculator-and-visual-language.md) | Готов | [E002-T002](tasks/t002-quick-entry.md), [E002-T003](tasks/t003-warmup-and-history.md), [E002-T004](tasks/t004-input-preservation.md), [E002-T005](tasks/t005-results-and-analytics.md); от E003 требуется согласованный перечень мобильных браузеров и условий приёмки, а не завершение E003 целиком. |
