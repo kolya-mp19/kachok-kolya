@@ -1,9 +1,13 @@
-# Локальные файлы операционной системы и редакторов
+node_modules/
 .DS_Store
 Thumbs.db
 /.idea/
 /.vscode/
-
-# Локальные настройки и секреты
-.env*
 *.pem
+dist/
+.env
+.env.*
+!.env.example
+playwright-report/
+test-results/
+.scratch/

@@ -1,0 +1,11 @@
+@layer theme, base, antd, components, utilities;
+@import "tailwindcss";
+
+@layer base {
+  body {
+    margin: 0;
+    background: #fafaf9;
+    color: #1c2923;
+    font-family: system-ui, sans-serif;
+  }
+}
