@@ -54,6 +54,17 @@
     background: #fff;
   }
   .empty-state p { margin-top: 0.75rem; }
+  .recovery-action {
+    margin-top: 1rem;
+    min-height: 44px;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #2457a7;
+    border-radius: 8px;
+    background: #2457a7;
+    color: #fff;
+    font: inherit;
+    cursor: pointer;
+  }
   .skip-link {
     position: absolute;
     top: 0.5rem;

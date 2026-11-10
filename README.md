@@ -41,6 +41,7 @@ npm run dev
 
 ```powershell
 npm run build
+npx playwright install chromium
 npm test
 npm start
 ```
@@ -49,6 +50,11 @@ npm start
 NestJS обслуживает статику и известные точки входа SPA; неизвестный API возвращает JSON 404.
 `npm run typecheck` отдельно проверяет сервер, клиент и конфигурацию Vite.
 HTTP-проверка запускает собранный сервер на порту 3017; этот порт должен быть свободен.
+Браузерная проверка использует свободный порт 3018 и Chromium Playwright: прямые входы,
+мобильную компоновку, задержку и сбой загрузки модулей, обновление и переход при ошибке.
+Для установленного Chromium можно задать полный путь к исполняемому файлу через
+`PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH`; обычно используется браузер из команды установки выше.
+Отдельный прогон: `node --test tests/mobile-shell.test.mjs` после сборки.
 Проверка начинается после сборки. `npm run dev:web` запускает независимый клиент без API.
 Для воспроизведения в чистом каталоге клонируйте репозиторий и выполните эти команды;
 не копируйте `node_modules`, `dist` и `.env` с другой машины.
@@ -64,6 +70,8 @@ HTTP-проверка запускает собранный сервер на п
 и [NestJS](https://docs.nestjs.com/faq/versions). Нижняя граница CSS — Safari 16.4 и
 Chrome 111 по [Tailwind](https://tailwindcss.com/docs/compatibility); цель Vite задана явно.
 Ant Design использует [CSS-слой antd](https://ant.design/docs/react/compatible-style/).
+Заявленная [поддержка Ant Design](https://ant.design/docs/react/introduce/) охватывает
+две последние версии Chrome и Safari и соответствует целевой матрице E003.
 Это технические минимумы; приёмка на стабильной и предыдущей версиях реальных Safari iOS
 и Chrome Android остаётся по [матрице E003](docs/implementation/epics/e003-release-design/design/acceptance-matrix.md).
 Эмуляция браузера не заменяет проверку реальных устройств.
