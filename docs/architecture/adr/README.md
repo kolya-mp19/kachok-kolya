@@ -36,6 +36,7 @@
 | [0019](./ADR-0019-interrupted-cycle-metrics.md) | Прерывание оценивает начавшиеся недели, будущие недели отменяются | Цикл, регулярность, точность плана, история |
 
 | [0020](./ADR-0020-javascript-modular-monolith.md) | TypeScript, NestJS, React SPA, Ant Design/Tailwind, PostgreSQL и Prisma; один сервер Docker Compose | Стек и размещение |
+| [0021](./ADR-0021-durable-drafts-and-operation-receipts.md) | Зашифрованные черновики IndexedDB и постоянные квитанции операций | Сохранность ввода, повтор, изоляция аккаунтов |
 
 Нумерация сквозная, по возрастанию, без пропусков.
 

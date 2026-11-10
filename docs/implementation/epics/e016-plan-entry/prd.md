@@ -123,6 +123,17 @@ E022 подключает предписание и явную подстано�
 | [week-planning](../../../requirements/week-planning/index.md), R20–R21 | Активный цикл и русский интерфейс |
 | [ADR-0006](../../../architecture/adr/ADR-0006-structured-plan-not-text.md), [ADR-0007](../../../architecture/adr/ADR-0007-set-roles-peak-rule.md) | Структурное хранение и сохранённые роли подходов |
 
+## Принятые технические решения E001
+
+Нотация преобразуется в отдельные структурные подходы с ролями и точными десятичными весами.
+Исходная незавершённая строка остаётся локальным черновиком по T007; факт требует целостной пары.
+Первый факт проверяет обязательные значения всех подходов и фиксирует всю основную часть тренировки.
+Отсутствие МПВ не блокирует ручной ввод; PLAN-Q1 решается отдельно по существующему реестру.
+
+Основание: [результат E001](../e001-technical-design/design/manual-plan-and-fact.md),
+[ADR-0020](../../../architecture/adr/ADR-0020-javascript-modular-monolith.md),
+[ADR-0021](../../../architecture/adr/ADR-0021-durable-drafts-and-operation-receipts.md).
+
 ## Связанные документы
 
 - [Карточка эпика](./README.md), [E015](../e015-cycle-lifecycle/README.md), [E017](../e017-plan-management/README.md)

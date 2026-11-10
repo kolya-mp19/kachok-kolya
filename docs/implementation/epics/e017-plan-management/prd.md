@@ -125,6 +125,17 @@ E021–E024 используют исторический тип и роли; и
 | [cycle](../../../requirements/cycle/index.md), R4, R12, R14 | План прерванного цикла, явное создание следующего и граница недели |
 | [ADR-0018](../../../architecture/adr/ADR-0018-plan-and-history-boundaries.md), [ADR-0019](../../../architecture/adr/ADR-0019-interrupted-cycle-metrics.md) | Неизменное намерение и сохранённое отменённое будущее |
 
+## Принятые технические решения E001
+
+Копирование создаёт новые идентификаторы и структуру без весов, фактов и признаков выполнения.
+Первый факт фиксирует всю тренировку, конец недели и прерывание — также не начатый план. Неполная
+копия фиксируется с отсутствующими значениями, не дополняется задним числом и не допускает первую
+отметку. Снятие факта не открывает план.
+
+Основание: [результат E001](../e001-technical-design/design/calendar-and-interruption.md),
+[ADR-0020](../../../architecture/adr/ADR-0020-javascript-modular-monolith.md),
+[ADR-0021](../../../architecture/adr/ADR-0021-durable-drafts-and-operation-receipts.md).
+
 ## Связанные документы
 
 - [Карточка эпика](./README.md), [E015](../e015-cycle-lifecycle/README.md), [E016](../e016-plan-entry/README.md)

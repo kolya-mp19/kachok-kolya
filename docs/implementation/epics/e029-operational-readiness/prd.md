@@ -126,6 +126,18 @@ E028, открытие доступа аудитории — E030. Новые п
 | [exercise-catalog](../../../requirements/exercise-catalog/index.md), R5.3–R5.7 | Восстановление исходной принадлежности источников |
 | [max-and-progression](../../../requirements/max-and-progression/index.md), R5–R6.2 | История исправлений и хронологические расчёты |
 
+## Принятые технические решения E001
+
+Проверяется один сервер Docker Compose с HTTPS, статикой, NestJS и внутренней PostgreSQL; версии
+приложения и Prisma Migrate определимы, окружения/секреты разделены. Диагностика не содержит личных
+данных. Система бэкапов сейчас по указанию владельца не проектируется; параметры будут согласованы в
+соответствующем объёме E003/E029 до выпуска. Требования восстановления настоящего PRD не отменяются
+и выполненными не объявляются.
+
+Основание: [результат E001](../e001-technical-design/design/technology-stack.md),
+[ADR-0020](../../../architecture/adr/ADR-0020-javascript-modular-monolith.md),
+[ADR-0021](../../../architecture/adr/ADR-0021-durable-drafts-and-operation-receipts.md).
+
 ## Связанные документы
 
 - [Карточка эпика](./README.md), [E003](../e003-release-design/README.md), [E006](../e006-delivery-foundation/README.md)

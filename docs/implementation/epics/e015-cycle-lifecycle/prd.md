@@ -115,6 +115,17 @@
 | [week-planning](../../../requirements/week-planning/index.md), R20–R20.1 | Планирование только внутри активного цикла, история доступна отдельно |
 | [ADR-0019](../../../architecture/adr/ADR-0019-interrupted-cycle-metrics.md) | Сохранение отменённого плана и передача области показателей в E024 |
 
+## Принятые технические решения E001
+
+Календарь — Europe/Moscow, сегодня определяется часами PostgreSQL после блокировки владельца.
+Обработчик и приведение до чтения/изменения обрабатывают все истёкшие границы идемпотентно.
+Прерывание фиксирует остаток плана и дату действия, учитывает начавшиеся недели целиком и отменяет
+будущие. Повтор не меняет дату; поздний факт не возобновляет прерванный цикл и не обновляет его МПВ.
+
+Основание: [результат E001](../e001-technical-design/design/calendar-and-interruption.md),
+[ADR-0020](../../../architecture/adr/ADR-0020-javascript-modular-monolith.md),
+[ADR-0021](../../../architecture/adr/ADR-0021-durable-drafts-and-operation-receipts.md).
+
 ## Связанные документы
 
 - [Карточка эпика](./README.md), [E016](../e016-plan-entry/README.md), [E017](../e017-plan-management/README.md)

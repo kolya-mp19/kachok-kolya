@@ -124,6 +124,16 @@
 | [calculator](../../../requirements/calculator/index.md), R13, §§7–8 | Русский интерфейс, названия формул, отсутствие сохранения и ограничений веса |
 | [auth](../../../requirements/auth/index.md), R7–R8 | Отсутствие зависимости от сессии и данных дневника |
 
+## Принятые технические решения E001
+
+Калькулятор имеет отдельную клиентскую точку React SPA/Vite с Ant Design и Tailwind CSS. Не
+загружает сессию, не вызывает API и не читает черновики дневника даже при выполненном входе. Переход
+в дневник остаётся явным.
+
+Основание: [результат E001](../e001-technical-design/design/access-and-trust.md),
+[ADR-0020](../../../architecture/adr/ADR-0020-javascript-modular-monolith.md),
+[ADR-0021](../../../architecture/adr/ADR-0021-durable-drafts-and-operation-receipts.md).
+
 ## Связанные документы
 
 - [Карточка эпика](./README.md), [E007](../e007-calculator-engine/README.md)

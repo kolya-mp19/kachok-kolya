@@ -111,6 +111,16 @@ Classic Powerlifting из публикации IPF «The IPF GL Coefficients for
 | [calculator](../../../requirements/calculator/index.md), R10–R12 | Неокруглённое сравнение, места, порядок, лидеры; представление в E008 |
 | [calculator](../../../requirements/calculator/index.md), §§7–8 | Редакции формул, проверка коэффициентов и краёв диапазона |
 
+## Принятые технические решения E001
+
+Калькулятор — отдельный клиентский контекст TypeScript. Спортсмены, попытки, формула и рейтинг
+существуют только в памяти вкладки; нет API, аккаунта и чтения данных дневника. Общими могут быть
+только визуальные элементы без доступа к данным.
+
+Основание: [результат E001](../e001-technical-design/design/manual-plan-and-fact.md),
+[ADR-0020](../../../architecture/adr/ADR-0020-javascript-modular-monolith.md),
+[ADR-0021](../../../architecture/adr/ADR-0021-durable-drafts-and-operation-receipts.md).
+
 ## Связанные документы
 
 - [Карточка эпика](./README.md), [E008](../e008-calculator-experience/README.md)
