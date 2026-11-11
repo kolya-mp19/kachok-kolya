@@ -8,6 +8,9 @@
     "esModuleInterop": true,
     "noEmit": true
   },
-  "include": ["vite.config.mts"]
+  "include": [
+    "vite.config.mts",
+    "prisma.config.ts",
+    "scripts/**/*.mts"
+  ]
 }
-
