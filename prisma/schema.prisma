@@ -5,3 +5,20 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
+model DraftKey {
+  athleteId String @id
+  keyId     String @unique @db.Uuid
+  key       Bytes
+}
+
+model OperationReceipt {
+  athleteId          String
+  operationId        String @db.Uuid
+  recoveryGeneration String
+  commandHash        String
+  revision           String
+  result             Json
+
+  @@id([athleteId, operationId])
+}

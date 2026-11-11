@@ -39,7 +39,7 @@ test('чистая схема, повтор миграции и новый пр�
     assert.equal(command('migrate', url).status, 0);
     const first = command('status', url);
     assert.equal(first.status, 0, first.output);
-    assert.deepEqual(JSON.parse(first.output).migrations, ['202611110001_storage_foundation']);
+    assert.deepEqual(JSON.parse(first.output).migrations, ['202611110001_storage_foundation', '202611110002_draft_keys', '202611110003_operation_receipts']);
     assert.equal(command('migrate', url).status, 0);
     assert.deepEqual(command('status', url), first);
   });
