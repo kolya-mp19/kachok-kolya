@@ -7,6 +7,8 @@
     "npm": ">=11 <12"
   },
   "scripts": {
+    "format": "prettier --write apps contracts scripts tests vite.config.mts prisma.config.ts",
+    "format:check": "prettier --check apps contracts scripts tests vite.config.mts prisma.config.ts",
     "dev": "concurrently --kill-others-on-fail -n api,web \"npm:dev:api\" \"npm:dev:web\"",
     "dev:api": "tsx watch --tsconfig apps/api/tsconfig.json --env-file-if-exists=.env apps/api/src/main.ts",
     "dev:web": "vite --host 127.0.0.1",
@@ -44,6 +46,7 @@
     "@vitejs/plugin-react": "6.3.0",
     "concurrently": "10.0.7",
     "playwright": "1.65.0",
+    "prettier": "3.10.0",
     "prisma": "7.10.1",
     "tailwindcss": "4.3.5",
     "tsx": "4.23.15",

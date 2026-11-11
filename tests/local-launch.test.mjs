@@ -1,9 +1,8 @@
-import { spawn } from 'node:child_process';
-import { once } from 'node:events';
-import { setTimeout } from 'node:timers/promises';
+import { startLocalServer } from './helpers/local-server.mjs';
+import { removeTestDirectory } from './helpers/test-directory.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { cp, mkdtemp, rm } from 'node:fs/promises';
+import { cp, mkdtemp } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 
@@ -11,25 +10,13 @@ test('собранная оболочка и API запускаются без �
   // Путь checkout может содержать скрытый каталог; это не скрытые файлы сайта.
   const checkout = await mkdtemp(join(tmpdir(), '.kachok-launch-'));
   await cp(resolve('dist/web'), join(checkout, 'dist/web'), { recursive: true });
-  const server = spawn(process.execPath, [resolve('dist/api/main.js')], {
+  const server = await startLocalServer({
+    arguments_: [resolve('dist/api/main.js')],
     cwd: checkout,
-    env: { ...process.env, PORT: '3017' },
-    stdio: 'pipe',
+    port: 3017,
+    healthPath: '/api/health',
   });
-  let output = '';
-  server.stdout.on('data', (data) => { output += data; });
-  server.stderr.on('data', (data) => { output += data; });
   try {
-    let ready = false;
-    for (let attempt = 0; attempt < 100; attempt++) {
-      assert.equal(server.exitCode, null, output);
-      try {
-        const response = await fetch('http://127.0.0.1:3017/api/health');
-        if (response.ok) { ready = true; break; }
-      } catch { /* Сервер ещё запускается. */ }
-      await setTimeout(100);
-    }
-    assert.ok(ready, output);
     const health = await fetch('http://127.0.0.1:3017/api/health');
     assert.deepEqual(await health.json(), { status: 'ok' });
     const page = await fetch('http://127.0.0.1:3017/', { headers: { Accept: 'text/html' } });
@@ -44,10 +31,7 @@ test('собранная оболочка и API запускаются без �
     assert.equal(unknownApi.status, 404);
     assert.match(unknownApi.headers.get('content-type'), /application\/json/);
   } finally {
-    if (server.exitCode === null && server.signalCode === null) {
-      server.kill();
-      await once(server, 'exit');
-    }
-    await rm(checkout, { recursive: true, force: true });
+    await server.stop();
+    await removeTestDirectory(checkout, tmpdir());
   }
 });

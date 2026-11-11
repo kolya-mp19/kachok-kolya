@@ -15,7 +15,9 @@ test('идентификатор атлета из недоверенного JS
   const credential = JSON.parse('{"athleteId":"athlete-a"}');
   let value = 'исходное';
   await assert.rejects(
-    operations.run(credential, 'athlete-a', async () => { value = 'изменено'; }),
+    operations.run(credential, 'athlete-a', async () => {
+      value = 'изменено';
+    }),
     { code: 'ACCESS_REQUIRED' },
   );
   assert.equal(value, 'исходное');
@@ -25,7 +27,9 @@ test('подтверждённый доступ не позволяет выпо
   const operations = createOwnedOperations(async () => ({ athleteId: 'athlete-a' }));
   let value = 'исходное';
   await assert.rejects(
-    operations.run('session-a', 'athlete-b', async () => { value = 'изменено'; }),
+    operations.run('session-a', 'athlete-b', async () => {
+      value = 'изменено';
+    }),
     { code: 'OWNER_MISMATCH' },
   );
   assert.equal(value, 'исходное');
@@ -36,7 +40,9 @@ test('контекст операции не позволяет заменить
   const operations = createOwnedOperations(async () => access);
   const result = await operations.run('session-a', 'athlete-a', async (owner) => {
     access.athleteId = 'athlete-b';
-    assert.throws(() => { owner.athleteId = 'athlete-b'; }, TypeError);
+    assert.throws(() => {
+      owner.athleteId = 'athlete-b';
+    }, TypeError);
     return owner.athleteId;
   });
   assert.equal(result, 'athlete-a');
@@ -46,7 +52,9 @@ test('отсутствующий владелец адаптера не стан
   const operations = createOwnedOperations(async () => ({}));
   let value = 'исходное';
   await assert.rejects(
-    operations.run(undefined, undefined, async () => { value = 'изменено'; }),
+    operations.run(undefined, undefined, async () => {
+      value = 'изменено';
+    }),
     { code: 'ACCESS_REQUIRED' },
   );
   assert.equal(value, 'исходное');
@@ -59,7 +67,9 @@ test('отозванный доступ нельзя повторно испол
   sessions.delete('session-a');
   let value = 'исходное';
   await assert.rejects(
-    operations.run('session-a', 'athlete-a', async () => { value = 'изменено'; }),
+    operations.run('session-a', 'athlete-a', async () => {
+      value = 'изменено';
+    }),
     { code: 'ACCESS_REQUIRED' },
   );
   assert.equal(value, 'исходное');

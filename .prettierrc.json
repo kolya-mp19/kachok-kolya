@@ -1,0 +1,15 @@
+{
+  "singleQuote": true,
+  "trailingComma": "all",
+  "printWidth": 130,
+  "tabWidth": 2,
+  "overrides": [
+    {
+      "files": ["apps/web/**/*.{ts,tsx,css,html}"],
+      "options": {
+        "tabWidth": 4,
+        "printWidth": 120
+      }
+    }
+  ]
+}

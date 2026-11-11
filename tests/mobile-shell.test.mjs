@@ -1,34 +1,18 @@
 import assert from 'node:assert/strict';
-import { spawn } from 'node:child_process';
-import { once } from 'node:events';
-import { setTimeout } from 'node:timers/promises';
+import { startLocalServer } from './helpers/local-server.mjs';
+import { launchBrowser } from './helpers/browser.mjs';
 import test from 'node:test';
-import { chromium } from 'playwright';
 
 test('мобильная оболочка сохраняет навигацию при загрузке и сбое разделов', { timeout: 60000 }, async (t) => {
-  const origin = 'http://127.0.0.1:3018';
-  const server = spawn(process.execPath, ['dist/api/main.js'], {
-    env: { ...process.env, PORT: '3018' }, stdio: 'pipe',
+  const server = await startLocalServer({
+    arguments_: ['dist/api/main.js'],
+    port: 3018,
+    healthPath: '/api/health',
   });
-  let output = '';
-  server.stdout.on('data', (data) => { output += data; });
-  server.stderr.on('data', (data) => { output += data; });
+  const { origin } = server;
   let browser;
   try {
-    let ready = false;
-    for (let attempt = 0; attempt < 100; attempt++) {
-      assert.equal(server.exitCode, null, output);
-      try {
-        if ((await fetch(`${origin}/api/health`)).ok) { ready = true; break; }
-      } catch { /* Ожидание локального сервера. */ }
-      await setTimeout(100);
-    }
-    assert.ok(ready, output);
-    browser = await chromium.launch({
-      headless: true,
-      ...(process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH
-        ? { executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH } : {}),
-    });
+    browser = await launchBrowser();
 
     await t.test('прямые входы, обновление и переходы доступны на узком экране', async () => {
       for (const width of [320, 360, 390]) {
@@ -48,7 +32,9 @@ test('мобильная оболочка сохраняет навигацию 
           await page.getByRole('heading', { name: 'Дневник появится позже' }).waitFor();
           await page.reload();
           await page.getByRole('heading', { name: 'Дневник появится позже' }).waitFor();
-          await page.evaluate(() => { document.documentElement.style.fontSize = '200%'; });
+          await page.evaluate(() => {
+            document.documentElement.style.fontSize = '200%';
+          });
           assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth));
           await nav.getByRole('link', { name: 'Калькулятор', exact: true }).click();
           await page.reload();
@@ -57,7 +43,9 @@ test('мобильная оболочка сохраняет навигацию 
           await page.keyboard.press('Tab');
           await page.keyboard.press('Enter');
           assert.equal(await page.evaluate(() => document.activeElement?.id), 'main-content');
-        } finally { await page.close(); }
+        } finally {
+          await page.close();
+        }
       }
     });
 
@@ -68,8 +56,13 @@ test('мобильная оболочка сохраняет навигацию 
       await t.test(`${path}: ожидание настоящего модуля видно пользователю`, async () => {
         const page = await browser.newPage({ viewport: { width: 320, height: 280 } });
         let release;
-        const gate = new Promise((resolve) => { release = resolve; });
-        await page.route(`**/${chunk}-*.js`, async (route) => { await gate; await route.continue(); });
+        const gate = new Promise((resolve) => {
+          release = resolve;
+        });
+        await page.route(`**/${chunk}-*.js`, async (route) => {
+          await gate;
+          await route.continue();
+        });
         try {
           await page.goto(`${origin}${path}`, { waitUntil: 'domcontentloaded' });
           await page.getByRole('status').filter({ hasText: 'Загружаем раздел…' }).waitFor();
@@ -78,7 +71,10 @@ test('мобильная оболочка сохраняет навигацию 
           release();
           await page.getByRole('heading', { name: heading }).waitFor();
           assert.equal(await page.getByRole('status').count(), 0);
-        } finally { release(); await page.close(); }
+        } finally {
+          release();
+          await page.close();
+        }
       });
 
       await t.test(`${path}: сбой загрузки допускает обновление и смену раздела`, async () => {
@@ -90,7 +86,9 @@ test('мобильная оболочка сохраняет навигацию 
           const error = page.getByRole('alert');
           await error.getByRole('heading', { name: 'Не удалось открыть раздел' }).waitFor();
           assert.doesNotMatch(await page.locator('body').innerText(), /TypeError|Error:|stack|\.js|\/assets\/|Failed to fetch/);
-          await page.evaluate(() => { document.documentElement.style.fontSize = '200%'; });
+          await page.evaluate(() => {
+            document.documentElement.style.fontSize = '200%';
+          });
           assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth));
           assert.ok((await error.getByRole('button', { name: 'Обновить страницу' }).boundingBox()).height >= 44);
           await page.getByRole('navigation').getByRole('link', { name: other, exact: true }).click();
@@ -100,14 +98,13 @@ test('мобильная оболочка сохраняет навигацию 
           await page.unroute(pattern);
           await error.getByRole('button', { name: 'Обновить страницу' }).click();
           await page.getByRole('heading', { name: heading }).waitFor();
-        } finally { await page.close(); }
+        } finally {
+          await page.close();
+        }
       });
     }
   } finally {
     await browser?.close();
-    if (server.exitCode === null) {
-      server.kill();
-      await once(server, 'exit');
-    }
+    await server.stop();
   }
 });

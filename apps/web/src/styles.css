@@ -1,78 +1,111 @@
 @layer theme, base, antd, components, utilities;
-@import "tailwindcss";
+@import 'tailwindcss';
 
 @layer base {
-  :root {
-    font-family: system-ui, sans-serif;
-    font-size: 16px;
-    line-height: 1.5;
-    color: #17212b;
-    background: #f6f7f9;
-  }
-  body { margin: 0; }
-  * { box-sizing: border-box; }
-  h1, h2, p { margin: 0; }
-  h1 { font-size: 1.5rem; line-height: 1.3334; font-weight: 600; }
-  h2 { font-size: 1.25rem; line-height: 1.4; font-weight: 600; }
-  a { color: #2457a7; }
-  :focus-visible { outline: 3px solid #153f85; outline-offset: 3px; }
+    :root {
+        font-family: system-ui, sans-serif;
+        font-size: 16px;
+        line-height: 1.5;
+        color: #17212b;
+        background: #f6f7f9;
+    }
+    body {
+        margin: 0;
+    }
+    * {
+        box-sizing: border-box;
+    }
+    h1,
+    h2,
+    p {
+        margin: 0;
+    }
+    h1 {
+        font-size: 1.5rem;
+        line-height: 1.3334;
+        font-weight: 600;
+    }
+    h2 {
+        font-size: 1.25rem;
+        line-height: 1.4;
+        font-weight: 600;
+    }
+    a {
+        color: #2457a7;
+    }
+    :focus-visible {
+        outline: 3px solid #153f85;
+        outline-offset: 3px;
+    }
 }
 
 @layer components {
-  .app-shell {
-    padding-top: max(1rem, env(safe-area-inset-top));
-    padding-bottom: max(1.5rem, env(safe-area-inset-bottom));
-    overflow-wrap: anywhere;
-  }
-  .app-header { padding-bottom: 1.5rem; }
-  .app-name { margin-bottom: 1rem; font-weight: 600; }
-  .context-navigation a {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 44px;
-    padding: 0.5rem 0.75rem;
-    border: 1px solid #c8d0da;
-    border-radius: 8px;
-    background: #fff;
-    text-decoration: none;
-  }
-  .context-navigation a[aria-current="page"] {
-    border-color: #2457a7;
-    color: #fff;
-    background: #2457a7;
-    font-weight: 600;
-    text-decoration: underline;
-    text-underline-offset: 4px;
-  }
-  .context-description { margin-top: 0.5rem; color: #556270; }
-  .empty-state {
-    margin-top: 1.5rem;
-    padding: 1rem;
-    border: 1px solid #c8d0da;
-    border-radius: 8px;
-    background: #fff;
-  }
-  .empty-state p { margin-top: 0.75rem; }
-  .recovery-action {
-    margin-top: 1rem;
-    min-height: 44px;
-    padding: 0.5rem 0.75rem;
-    border: 1px solid #2457a7;
-    border-radius: 8px;
-    background: #2457a7;
-    color: #fff;
-    font: inherit;
-    cursor: pointer;
-  }
-  .skip-link {
-    position: absolute;
-    top: 0.5rem;
-    left: 1rem;
-    z-index: 1;
-    padding: 0.75rem;
-    background: #fff;
-    transform: translateY(-200%);
-  }
-  .skip-link:focus { transform: translateY(0); }
+    .app-shell {
+        padding-top: max(1rem, env(safe-area-inset-top));
+        padding-bottom: max(1.5rem, env(safe-area-inset-bottom));
+        overflow-wrap: anywhere;
+    }
+    .app-header {
+        padding-bottom: 1.5rem;
+    }
+    .app-name {
+        margin-bottom: 1rem;
+        font-weight: 600;
+    }
+    .context-navigation a {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 44px;
+        padding: 0.5rem 0.75rem;
+        border: 1px solid #c8d0da;
+        border-radius: 8px;
+        background: #fff;
+        text-decoration: none;
+    }
+    .context-navigation a[aria-current='page'] {
+        border-color: #2457a7;
+        color: #fff;
+        background: #2457a7;
+        font-weight: 600;
+        text-decoration: underline;
+        text-underline-offset: 4px;
+    }
+    .context-description {
+        margin-top: 0.5rem;
+        color: #556270;
+    }
+    .empty-state {
+        margin-top: 1.5rem;
+        padding: 1rem;
+        border: 1px solid #c8d0da;
+        border-radius: 8px;
+        background: #fff;
+    }
+    .empty-state p {
+        margin-top: 0.75rem;
+    }
+    .recovery-action {
+        margin-top: 1rem;
+        min-height: 44px;
+        padding: 0.5rem 0.75rem;
+        border: 1px solid #2457a7;
+        border-radius: 8px;
+        background: #2457a7;
+        color: #fff;
+        font: inherit;
+        cursor: pointer;
+    }
+    .skip-link {
+        position: absolute;
+        top: 0.5rem;
+        left: 1rem;
+        z-index: 1;
+        padding: 0.75rem;
+        background: #fff;
+        transform: translateY(-200%);
+    }
+    .skip-link:focus {
+        transform: translateY(0);
+    }
 }

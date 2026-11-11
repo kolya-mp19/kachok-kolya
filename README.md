@@ -70,6 +70,21 @@ HTTP-проверка запускает собранный сервер на п
 Структура: [клиент](apps/web/src/main.tsx), [сервер](apps/api/src/main.ts),
 [сценарий проверки](tests/local-launch.test.mjs). Формулы и дневник появятся в следующих эпиках.
 
+## Работа с кодом
+
+Перед изменениями читать [общие соглашения](docs/architecture/coding-conventions.md),
+затем [руководство бэкенда](docs/architecture/backend-conventions.md) или
+[руководство фронтенда](docs/architecture/frontend-conventions.md).
+Комментарии и JSDoc объясняют причины проверок, ограничения и особые случаи.
+
+`npm run format` применяет Prettier к исходникам, контрактам, скриптам и тестам;
+`npm run format:check` проверяет форматирование. API использует отступ 2 пробела,
+web — 4. Проверка типов — `npm run typecheck`, полный прогон после сборки — `npm test`.
+Транспортные типы находятся в [общем контракте](contracts/operation-protocol.d.ts)
+без зависимости от Prisma, NestJS и браузера.
+
+## Совместимость оболочки
+
 Совместимость основы: Node 24 удовлетворяет требованиям [Vite](https://vite.dev/guide/)
 и [NestJS](https://docs.nestjs.com/faq/versions). Нижняя граница CSS — Safari 16.4 и
 Chrome 111 по [Tailwind](https://tailwindcss.com/docs/compatibility); цель Vite задана явно.
@@ -184,6 +199,16 @@ npm test
 Техническая основа E005 не добавляет формы, аутентификацию или маршруты записи.
 Сервер подключает [хранилище операций](apps/api/src/operations/operation-store.ts)
 через `createOperationStore(storage, ownedOperations, recoveryGeneration)`.
+Это автономная точка сборки: выполнение находится в
+[OperationsService](apps/api/src/operations/operations.service.ts), запросы — в
+[репозитории квитанций](apps/api/src/operations/operation-receipts.repository.ts) и
+[репозитории ключей](apps/api/src/operations/draft-keys.repository.ts).
+В NestJS тот же граф зависимостей подключается через
+[OperationsModule.register](apps/api/src/operations/operations.module.ts) с
+`databaseUrl`, `recoveryGeneration` и серверным `verifyAccess`.
+Модуль экспортирует `OperationsService` и закрывает клиент БД при остановке приложения.
+Автономный вызывающий код закрывает переданный клиент самостоятельно.
+До реализации сессий модуль не подключён к `AppModule` и не публикует HTTP-маршруты.
 Поколение — обязательная стабильная случайная строка серверной конфигурации **вне
 БД**. Её создают один раз, например `node -p "require('node:crypto').randomUUID()"`,
 сохраняют вместе с серверной конфигурацией и меняют до открытия восстановленной
@@ -221,6 +246,12 @@ npm test
 В браузере [openPendingInput](apps/web/src/diary/pending-input.ts) получает ключ,
 его идентификатор, подтверждённого владельца и поколение только из серверного
 адаптера S04. Ключ импортируется как неэкспортируемый CryptoKey и остаётся в памяти.
+Состояние и жизненный цикл разделены между
+[сессией](apps/web/src/diary/drafts/pending-input-session.ts),
+[редактором](apps/web/src/diary/drafts/draft-editor.ts),
+[шифрованием](apps/web/src/diary/drafts/encrypted-draft-storage.ts) и
+[репозиторием IndexedDB](apps/web/src/diary/drafts/indexed-draft.repository.ts).
+Расшифрованные данные проверяются парсером состояния; существующий формат записей сохраняется.
 `openEditor(draftId, baseRevision)` продолжает независимый редактор; `edit(fields)`
 сразу меняет поля в памяти и последовательно сохраняет ciphertext в IndexedDB.
 Каждая запись использует новый 96-битный IV; AAD связывает формат, владельца, ключ,

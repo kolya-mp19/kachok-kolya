@@ -24,6 +24,10 @@
 7. **[План реализации](./implementation/README.md)** — крупные шаги разработки,
    текущая точка и правила детализации в эпики с PRD и задачи;
    **[реестр эпиков](./implementation/epics/README.md)** — подробные планы всех шагов и их статусы.
+8. **[Общие соглашения о коде](./architecture/coding-conventions.md)** — читаемость,
+   типы, комментарии и JSDoc; **[бэкенд](./architecture/backend-conventions.md)** —
+   NestJS, сервисы, репозитории и транзакции;
+   **[фронтенд](./architecture/frontend-conventions.md)** — React, компоненты, формы и хуки.
 
 ## Что где лежит
 
@@ -33,6 +37,9 @@
 | `domain/<контекст>/CONTEXT.md` | Глоссарий. Только термины | Как только термин устоялся. Правил и реализации здесь нет |
 | `requirements/<фича>/index.md` | Бизнес-спека фичи | При проработке фичи. Каркас — в `requirements/_templates/` |
 | `architecture/adr/ADR-NNNN-*.md` | Решение и отвергнутые альтернативы | Когда решение трудно обратить, оно неочевидно и был реальный выбор |
+| [architecture/coding-conventions.md](./architecture/coding-conventions.md) | Общие правила TypeScript, комментариев и JSDoc | При уточнении общих правил реализации |
+| [architecture/backend-conventions.md](./architecture/backend-conventions.md) | Подходы и примеры для NestJS и Prisma | При уточнении серверных соглашений |
+| [architecture/frontend-conventions.md](./architecture/frontend-conventions.md) | Подходы и примеры для React | При уточнении клиентских соглашений |
 | `backlog.md` | Отложенная функциональность | Когда решили не делать сейчас: что это, почему отложили, что решать при возврате |
 | [implementation/README.md](./implementation/README.md) | Общий план реализации и прогресс | При планировании разработки и смене текущего этапа |
 | [implementation/epics/README.md](./implementation/epics/README.md) | Реестр эпиков, карточки и PRD; задачи добавляются отдельно | При детализации шагов и обновлении прогресса разработки |

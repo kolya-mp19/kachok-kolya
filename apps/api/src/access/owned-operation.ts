@@ -1,30 +1,11 @@
-export interface VerifiedAccess {
-  readonly athleteId: string;
-}
+import type { AccessVerifier } from './access.type.js';
+import { OwnedOperationsService } from './owned-operations.service.js';
 
-export class OwnedOperationError extends Error {
-  constructor(readonly code: 'ACCESS_REQUIRED' | 'OWNER_MISMATCH') {
-    super(code);
-  }
-}
+// Эти экспорты сохраняют существующую точку подключения технической основы E005.
+export type { VerifiedAccess } from './access.type.js';
+export { OwnedOperationError } from './owned-operation.error.js';
 
-// Подключается серверной сборкой приложения. Адаптер проверяет текущий доступ,
-// включая сессию и защиту изменения; он не является частью клиентского запроса.
-export function createOwnedOperations<Credential>(
-  verifyAccess: (credential: Credential) => Promise<VerifiedAccess | null>,
-) {
-  return {
-    async run<Result>(
-      credential: Credential,
-      expectedAthleteId: string,
-      operation: (owner: VerifiedAccess) => Promise<Result>,
-    ): Promise<Result> {
-      const owner = await verifyAccess(credential);
-      if (!owner || typeof owner.athleteId !== 'string' || !owner.athleteId.trim()) {
-        throw new OwnedOperationError('ACCESS_REQUIRED');
-      }
-      if (owner.athleteId !== expectedAthleteId) throw new OwnedOperationError('OWNER_MISMATCH');
-      return operation(Object.freeze({ athleteId: owner.athleteId }));
-    },
-  };
+/** Для автономного подключения без контейнера; NestJS использует AccessModule.register. */
+export function createOwnedOperations<Credential>(verifyAccess: AccessVerifier<Credential>): OwnedOperationsService<Credential> {
+  return new OwnedOperationsService(verifyAccess);
 }
