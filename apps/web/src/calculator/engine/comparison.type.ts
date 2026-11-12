@@ -1,5 +1,5 @@
 export type ParticipantSex = 'male' | 'female';
-export type ComparisonFormula = 'wilks' | 'ipf-gl';
+export type ComparisonFormula = 'wilks' | 'ipf-gl' | 'dots';
 export type NumericInput = string | number | null | undefined;
 export type Attempts = readonly [NumericInput?, NumericInput?, NumericInput?];
 

@@ -5,8 +5,15 @@ import type {
     ComparisonRow,
     NumericInput,
 } from './comparison.type';
+import { calculateDotsCoefficient } from './dots';
 import { calculateIpfGlCoefficient } from './ipf-gl';
 import { calculateWilksCoefficient } from './wilks';
+
+const coefficientCalculators = {
+    wilks: calculateWilksCoefficient,
+    'ipf-gl': calculateIpfGlCoefficient,
+    dots: calculateDotsCoefficient,
+};
 
 /**
  * Чистый пересчёт по общей формуле сессии; по умолчанию — оригинальный Уилкс.
@@ -55,10 +62,7 @@ function calculateParticipant(participant: ComparisonParticipant, formula: Compa
         return row;
     }
 
-    const coefficient =
-        formula === 'ipf-gl'
-            ? calculateIpfGlCoefficient(participant.sex, bodyWeight)
-            : calculateWilksCoefficient(participant.sex, bodyWeight);
+    const coefficient = coefficientCalculators[formula](participant.sex, bodyWeight);
     const score = bestAttempt * coefficient;
     // R8.1: отказ любой вычисленной величины скрывает обе, но не лучшую попытку.
     if (!Number.isFinite(coefficient) || !Number.isFinite(score)) {
