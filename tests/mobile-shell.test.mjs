@@ -21,7 +21,7 @@ test('мобильная оболочка сохраняет навигацию 
         page.on('request', (request) => requests.push(request.url()));
         try {
           await page.goto(`${origin}/calculator`);
-          await page.getByRole('heading', { name: 'Расчёты появятся позже' }).waitFor();
+          await page.getByRole('heading', { name: 'Рейтинг · Уилкс' }).waitFor();
           assert.ok(!requests.some((url) => /\/api\/|session|DiaryPage/.test(url)), requests.join('\n'));
           const nav = page.getByRole('navigation', { name: 'Разделы приложения' });
           assert.equal(await nav.getByRole('link', { name: 'Калькулятор', exact: true }).getAttribute('aria-current'), 'page');
@@ -38,7 +38,7 @@ test('мобильная оболочка сохраняет навигацию 
           assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth));
           await nav.getByRole('link', { name: 'Калькулятор', exact: true }).click();
           await page.reload();
-          await page.getByRole('heading', { name: 'Расчёты появятся позже' }).waitFor();
+          await page.getByRole('heading', { name: 'Рейтинг · Уилкс' }).waitFor();
           assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth));
           await page.keyboard.press('Tab');
           await page.keyboard.press('Enter');
@@ -50,8 +50,8 @@ test('мобильная оболочка сохраняет навигацию 
     });
 
     for (const [path, chunk, heading, other, otherHeading] of [
-      ['/calculator', 'CalculatorPage', 'Расчёты появятся позже', 'Дневник', 'Дневник появится позже'],
-      ['/diary', 'DiaryPage', 'Дневник появится позже', 'Калькулятор', 'Расчёты появятся позже'],
+      ['/calculator', 'CalculatorPage', 'Рейтинг · Уилкс', 'Дневник', 'Дневник появится позже'],
+      ['/diary', 'DiaryPage', 'Дневник появится позже', 'Калькулятор', 'Рейтинг · Уилкс'],
     ]) {
       await t.test(`${path}: ожидание настоящего модуля видно пользователю`, async () => {
         const page = await browser.newPage({ viewport: { width: 320, height: 280 } });
@@ -70,7 +70,7 @@ test('мобильная оболочка сохраняет навигацию 
           assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth));
           release();
           await page.getByRole('heading', { name: heading }).waitFor();
-          assert.equal(await page.getByRole('status').count(), 0);
+          assert.equal(await page.getByRole('status').filter({ hasText: 'Загружаем раздел…' }).count(), 0);
         } finally {
           release();
           await page.close();

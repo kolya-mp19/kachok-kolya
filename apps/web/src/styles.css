@@ -108,4 +108,82 @@
     .skip-link:focus {
         transform: translateY(0);
     }
+    .calculator-page {
+        container: calculator / inline-size;
+    }
+    .calculator-card,
+    .calculator-ranking-row {
+        min-width: 0;
+        padding: 1rem;
+        border: 1px solid #c8d0da;
+        border-radius: 8px;
+        background: #fff;
+    }
+    .calculator-attempts {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(min(100%, 4.5rem), 1fr));
+        gap: 0.75rem;
+    }
+    .calculator-attempts label {
+        font-size: 0.875rem;
+    }
+    .calculator-participant {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        align-items: start;
+        gap: 1rem;
+    }
+    .calculator-participant > :not(h2):not(.calculator-toggle) {
+        grid-column: 1 / -1;
+    }
+    .calculator-toggle {
+        grid-column: 2;
+        grid-row: 1;
+    }
+    @container calculator (max-width: 15rem) {
+        .calculator-participant {
+            grid-template-columns: minmax(0, 1fr);
+        }
+        .calculator-toggle {
+            grid-column: 1;
+            grid-row: auto;
+            justify-self: start;
+        }
+    }
+    .calculator-summary,
+    .calculator-ranking-details {
+        font-variant-numeric: tabular-nums;
+    }
+    .calculator-note,
+    .calculator-ranking-details dt {
+        color: #556270;
+        font-size: 0.875rem;
+        line-height: 1.4286;
+    }
+    .calculator-ranking-details {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(min(100%, 7rem), 1fr));
+        gap: 0.75rem;
+        margin: 0.75rem 0 0;
+    }
+    .calculator-ranking-details dd {
+        margin: 0.25rem 0 0;
+    }
+    .calculator-score {
+        grid-column: 1 / -1;
+    }
+    .calculator-score dd {
+        font-size: 1.5rem;
+        line-height: 1.3334;
+        font-weight: 600;
+    }
+    .calculator-leader {
+        border: 2px solid #2457a7;
+        padding: calc(1rem - 1px);
+    }
+    .calculator-leader-label {
+        margin-top: 0.5rem;
+        color: #2457a7;
+        font-weight: 600;
+    }
 }
