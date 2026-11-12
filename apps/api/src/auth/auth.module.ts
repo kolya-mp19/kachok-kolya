@@ -4,7 +4,9 @@ import { AUTH_CONFIG, readAuthConfig } from './auth.config.js';
 import { AuthController } from './auth.controller.js';
 import { AuthProtectionService } from './auth-protection.service.js';
 import { AuthRepository } from './auth.repository.js';
-import { RegistrationMailService } from './registration-mail.service.js';
+import { EmailActionMailService } from './email-action-mail.service.js';
+import { PasswordRecoveryRepository } from './password-recovery.repository.js';
+import { PasswordRecoveryService } from './password-recovery.service.js';
 import { RegistrationService } from './registration.service.js';
 import { SessionRepository } from './session.repository.js';
 import { SessionService } from './session.service.js';
@@ -24,7 +26,9 @@ export class AuthModule {
         { provide: AUTH_CONFIG, useValue: readAuthConfig(env) },
         AuthRepository,
         AuthProtectionService,
-        RegistrationMailService,
+        EmailActionMailService,
+        PasswordRecoveryRepository,
+        PasswordRecoveryService,
         RegistrationService,
         SessionRepository,
         SessionService,

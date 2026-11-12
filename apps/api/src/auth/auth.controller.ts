@@ -1,9 +1,22 @@
 import { Body, Controller, Get, Inject, Post, Req, Res } from '@nestjs/common';
 import type { CookieOptions, Request, Response } from 'express';
-import type { AuthAttemptResponse, RegistrationResponse, SessionResponse } from '../../../../contracts/email-access.js';
+import type {
+  AuthAttemptResponse,
+  RegistrationResponse,
+  SessionResponse,
+  RecoveryResponse,
+} from '../../../../contracts/email-access.js';
 import { AUTH_CONFIG, type AuthConfig } from './auth.config.js';
 import { AuthProtectionService } from './auth-protection.service.js';
-import { parseConfirmation, parsePendingId, parseRegistration, parsePasswordLogin } from './auth-parser.js';
+import {
+  parseConfirmation,
+  parsePendingId,
+  parseRegistration,
+  parsePasswordLogin,
+  parseRecoveryEmail,
+  parseRecoveryConfirmation,
+} from './auth-parser.js';
+import { PasswordRecoveryService } from './password-recovery.service.js';
 import { PasswordLoginService } from './password-login.service.js';
 import { RegistrationService } from './registration.service.js';
 import { SessionService } from './session.service.js';
@@ -29,6 +42,7 @@ export class AuthController {
     @Inject(RegistrationService) private readonly registration: RegistrationService,
     @Inject(SessionService) private readonly sessions: SessionService,
     @Inject(PasswordLoginService) private readonly passwords: PasswordLoginService,
+    @Inject(PasswordRecoveryService) private readonly recoveries: PasswordRecoveryService,
   ) {}
 
   @Get('attempt')
@@ -125,6 +139,55 @@ export class AuthController {
       expires: result.session.expiresAt,
     });
     return result.identity;
+  }
+
+  @Post('recovery')
+  async beginRecovery(
+    @Body() body: unknown,
+    @Req() request: Request,
+    @Res({ passthrough: true }) response: Response,
+  ): Promise<RecoveryResponse> {
+    this.preventCache(response);
+    const attemptHash = await this.verify(request);
+    return this.recoveries.begin({ normalizedEmail: parseRecoveryEmail(body), attemptHash, ip: this.ip(request) });
+  }
+
+  @Post('recovery/resend')
+  async resendRecovery(
+    @Body() body: unknown,
+    @Req() request: Request,
+    @Res({ passthrough: true }) response: Response,
+  ): Promise<RecoveryResponse> {
+    this.preventCache(response);
+    const attemptHash = await this.verify(request);
+    return this.recoveries.resend(parsePendingId(body), attemptHash, this.ip(request));
+  }
+
+  @Post('recovery/cancel')
+  async cancelRecovery(
+    @Body() body: unknown,
+    @Req() request: Request,
+    @Res({ passthrough: true }) response: Response,
+  ): Promise<{ status: 'cancelled' }> {
+    this.preventCache(response);
+    const attemptHash = await this.verify(request);
+    await this.recoveries.cancel(parsePendingId(body), attemptHash);
+    return { status: 'cancelled' };
+  }
+
+  @Post('recovery/confirm')
+  async confirmRecovery(
+    @Body() body: unknown,
+    @Req() request: Request,
+    @Res({ passthrough: true }) response: Response,
+  ): Promise<{ status: 'reset' }> {
+    this.preventCache(response);
+    await this.verify(request);
+    await this.recoveries.confirm({ ...parseRecoveryConfirmation(body), ip: this.ip(request) });
+    // Новый пароль не создаёт сессию: все прежние сессии уже отозваны в БД,
+    // дальнейший доступ требует обычного входа согласно E001.
+    response.clearCookie(this.config.sessionCookie, this.cookieOptions());
+    return { status: 'reset' };
   }
 
   private ip(request: Request): string {

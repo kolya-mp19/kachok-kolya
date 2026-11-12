@@ -3,6 +3,24 @@ import { AuthError } from './auth.error.js';
 export type RegistrationInput = { name: string; email: string; normalizedEmail: string; password: string };
 export type PasswordLoginInput = { normalizedEmail: string; password: string };
 
+export function parseRecoveryEmail(input: unknown): string {
+  const fields = objectInput(input);
+  const email = typeof fields.email === 'string' ? fields.email.trim() : '';
+  if (email.length > 254 || !/^[^\s@<>]+@[^\s@<>]+\.[^\s@<>]+$/.test(email)) {
+    throw new AuthError('INVALID_INPUT');
+  }
+  return email.toLowerCase();
+}
+
+export function parseRecoveryConfirmation(input: unknown): { token: string; password: string } {
+  const token = parseConfirmation(input);
+  const fields = objectInput(input);
+  if (typeof fields.password !== 'string' || fields.password.length < 12 || fields.password.length > 256) {
+    throw new AuthError('INVALID_INPUT');
+  }
+  return { token, password: fields.password };
+}
+
 export function parsePasswordLogin(input: unknown): PasswordLoginInput {
   const fields = objectInput(input);
   const email = typeof fields.email === 'string' ? fields.email.trim() : '';

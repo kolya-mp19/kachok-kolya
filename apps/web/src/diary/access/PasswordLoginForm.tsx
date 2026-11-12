@@ -5,10 +5,11 @@ type PasswordLoginFormProps = {
     isSubmitting: boolean;
     onSubmit: (input: PasswordLoginRequest) => Promise<void>;
     onRegister: () => void;
+    onRecover: () => void;
 };
 
 /** Сценарий обрабатывает отказ; форма сохраняет введённый пароль до успешного входа. */
-export function PasswordLoginForm({ isSubmitting, onSubmit, onRegister }: PasswordLoginFormProps) {
+export function PasswordLoginForm({ isSubmitting, onSubmit, onRegister, onRecover }: PasswordLoginFormProps) {
     return (
         <Form<PasswordLoginRequest>
             layout="vertical"
@@ -49,6 +50,9 @@ export function PasswordLoginForm({ isSubmitting, onSubmit, onRegister }: Passwo
                 Войти
             </Button>
             <div className="diary-access-actions">
+                <Button htmlType="button" onClick={onRecover} disabled={isSubmitting} block>
+                    Забыли пароль
+                </Button>
                 <Button htmlType="button" onClick={onRegister} disabled={isSubmitting} block>
                     Создать дневник
                 </Button>

@@ -33,6 +33,7 @@ model Athlete {
   createdAt       DateTime @default(now())
   diary           Diary?
   sessions        AuthSession[]
+  recoveries      PasswordRecovery[]
 }
 
 model Diary {
@@ -83,4 +84,23 @@ model AuthRateBucket {
   key         String   @id
   windowStart DateTime
   count       Int
+}
+
+model PasswordRecovery {
+  id              String    @id @default(uuid()) @db.Uuid
+  purpose         String    @default("recovery")
+  tokenHash       String    @unique
+  normalizedEmail String
+  athleteId       String?   @db.Uuid
+  athlete         Athlete?  @relation(fields: [athleteId], references: [id], onDelete: Cascade)
+  accessRevision  Int?
+  attemptHash     String
+  expiresAt       DateTime
+  deliveredAt     DateTime?
+  deliveryFailedAt DateTime?
+  consumedAt      DateTime?
+  cancelledAt     DateTime?
+  createdAt       DateTime  @default(now())
+
+  @@index([athleteId])
 }

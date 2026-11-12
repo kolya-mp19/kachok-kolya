@@ -4,11 +4,13 @@ import type {
     PasswordLoginRequest,
     RegistrationResponse,
     SessionResponse,
+    RecoveryRequest,
+    RecoveryResponse,
 } from '../../../../../contracts/email-access';
 
 const messages: Record<string, string> = {
     INVALID_INPUT: 'Проверьте имя и почту. Пароль должен содержать от 12 до 256 символов.',
-    CSRF_INVALID: 'Время действия формы истекло. Обновите страницу и повторите действие.',
+    CSRF_INVALID: 'Время действия формы истекло. Повторите действие. Для нового письма можно заново указать почту.',
     EMAIL_UNAVAILABLE: 'Этот адрес уже зарегистрирован. Войдите в прежний дневник.',
     INVALID_LOGIN: 'Не удалось войти. Проверьте почту и пароль.',
     CONFIRMATION_INVALID: 'Ссылка недействительна, использована или срок её действия истёк. Запросите новое письмо.',
@@ -17,7 +19,14 @@ const messages: Record<string, string> = {
 };
 
 /** Только этот тип содержит подготовленный для атлета безопасный текст. */
-export class EmailAccessError extends Error {}
+export class EmailAccessError extends Error {
+    constructor(
+        message: string,
+        readonly code?: string,
+    ) {
+        super(message);
+    }
+}
 
 function isObject(value: unknown): value is Record<string, unknown> {
     return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
@@ -44,6 +53,7 @@ async function request(path: string, input?: { body: unknown; csrfToken: string 
         const code = isObject(result) && typeof result.code === 'string' ? result.code : '';
         throw new EmailAccessError(
             messages[code] ?? 'Доступ к дневнику временно недоступен. Повторите действие позже.',
+            code,
         );
     }
     return result;
@@ -103,4 +113,33 @@ export async function cancelRegistration(pendingId: string, csrfToken: string): 
 
 export async function confirmRegistration(token: string, csrfToken: string): Promise<SessionResponse> {
     return parseIdentity(await request('registration/confirm', { body: { token }, csrfToken }));
+}
+
+function parseRecoveryResponse(result: unknown): RecoveryResponse {
+    if (!isObject(result) || result.status !== 'accepted' || typeof result.pendingId !== 'string') {
+        throw new EmailAccessError('Не удалось принять запрос письма. Повторите действие.');
+    }
+    return { status: 'accepted', pendingId: result.pendingId };
+}
+
+export async function requestRecovery(input: RecoveryRequest, csrfToken: string): Promise<RecoveryResponse> {
+    return parseRecoveryResponse(await request('recovery', { body: input, csrfToken }));
+}
+
+export async function resendRecovery(pendingId: string, csrfToken: string): Promise<RecoveryResponse> {
+    return parseRecoveryResponse(await request('recovery/resend', { body: { pendingId }, csrfToken }));
+}
+
+export async function cancelRecovery(pendingId: string, csrfToken: string): Promise<void> {
+    const result = await request('recovery/cancel', { body: { pendingId }, csrfToken });
+    if (!isObject(result) || result.status !== 'cancelled') {
+        throw new EmailAccessError('Не удалось подтвердить отмену. Повторите действие.');
+    }
+}
+
+export async function confirmRecovery(token: string, password: string, csrfToken: string): Promise<void> {
+    const result = await request('recovery/confirm', { body: { token, password }, csrfToken });
+    if (!isObject(result) || result.status !== 'reset') {
+        throw new EmailAccessError('Не удалось подтвердить смену пароля. Повторите действие.');
+    }
 }

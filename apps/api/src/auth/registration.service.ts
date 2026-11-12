@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import type { RegistrationResponse, SessionResponse } from '../../../../contracts/email-access.js';
 import { AuthRepository } from './auth.repository.js';
-import { RegistrationMailService } from './registration-mail.service.js';
+import { EmailActionMailService } from './email-action-mail.service.js';
 import { SessionService, type IssuedSession } from './session.service.js';
 import { hashPassword, hashSecret, newSecret } from './auth-secrets.js';
 import { AuthError } from './auth.error.js';
@@ -14,7 +14,7 @@ type RegistrationDelivery = { name: string; email: string; normalizedEmail: stri
 export class RegistrationService {
   constructor(
     @Inject(AuthRepository) private readonly registrations: AuthRepository,
-    @Inject(RegistrationMailService) private readonly mail: RegistrationMailService,
+    @Inject(EmailActionMailService) private readonly mail: EmailActionMailService,
     @Inject(SessionService) private readonly sessions: SessionService,
   ) {}
 

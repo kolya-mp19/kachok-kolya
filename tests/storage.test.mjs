@@ -24,6 +24,7 @@ test('чистая схема, повтор миграции и новый пр�
       '202611110002_draft_keys',
       '202611110003_operation_receipts',
       '202611120001_email_registration',
+      '202611120002_password_recovery',
     ]);
     assert.equal(runStorageCli('migrate', url).status, 0);
     assert.deepEqual(runStorageCli('status', url), first);

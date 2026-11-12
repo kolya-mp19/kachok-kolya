@@ -2,22 +2,28 @@ import { Alert, Button, Space } from 'antd';
 import { useLayoutEffect, useState } from 'react';
 import { RegistrationForm } from './access/RegistrationForm';
 import { PasswordLoginForm } from './access/PasswordLoginForm';
-import { useEmailAccess } from './access/useEmailAccess';
+import { useEmailAccess, type EmailLink } from './access/useEmailAccess';
+import { RecoveryRequestForm } from './access/RecoveryRequestForm';
+import { RecoveryPasswordForm } from './access/RecoveryPasswordForm';
 
-function readConfirmationToken(): string | null {
+function readEmailLink(): EmailLink | null {
     const fragment = new URLSearchParams(window.location.hash.slice(1));
-    const token = fragment.get('confirm');
-    return token;
+    const registration = fragment.get('confirm');
+    const recovery = fragment.get('recover');
+    if (recovery) {
+        return { purpose: 'recovery', token: recovery };
+    }
+    return registration ? { purpose: 'registration', token: registration } : null;
 }
 
 export default function DiaryPage() {
-    const [initialConfirmationToken, setInitialConfirmationToken] = useState(readConfirmationToken);
+    const [initialLink, setInitialLink] = useState(readEmailLink);
     useLayoutEffect(() => {
         // Чтение initializer остаётся чистым при StrictMode. Layout effect убирает
         // секрет из URL до сетевых эффектов; после unmount токена в модуле нет.
         const readLink = (): void => {
             if (window.location.hash) {
-                setInitialConfirmationToken(readConfirmationToken());
+                setInitialLink(readEmailLink());
                 window.history.replaceState(null, '', window.location.pathname);
             }
         };
@@ -26,7 +32,7 @@ export default function DiaryPage() {
         window.addEventListener('hashchange', readLink);
         return () => window.removeEventListener('hashchange', readLink);
     }, []);
-    const access = useEmailAccess(initialConfirmationToken);
+    const access = useEmailAccess(initialLink);
     return (
         <section aria-labelledby="diary-title">
             <h1 id="diary-title">Дневник</h1>
@@ -44,6 +50,7 @@ export default function DiaryPage() {
                     isSubmitting={access.isSubmitting}
                     onSubmit={access.register}
                     onLogin={() => access.showForm('login')}
+                    onRecover={() => access.showForm('recovery')}
                 />
             )}
             {access.state.status === 'login' && (
@@ -51,7 +58,57 @@ export default function DiaryPage() {
                     isSubmitting={access.isSubmitting}
                     onSubmit={access.login}
                     onRegister={() => access.showForm('registration')}
+                    onRecover={() => access.showForm('recovery')}
                 />
+            )}
+            {access.state.status === 'recovery' && (
+                <RecoveryRequestForm
+                    isSubmitting={access.isSubmitting}
+                    onSubmit={access.requestRecovery}
+                    onCancel={() => access.showForm('login')}
+                />
+            )}
+            {access.state.status === 'recovery-requested' && (
+                <div className="empty-state">
+                    <h2>Запрос принят</h2>
+                    <p role="status">
+                        Если для этой почты есть дневник, проверьте входящие. Если письма нет, повторите запрос позже.
+                        Пароль пока не изменён.
+                    </p>
+                    <Space direction="vertical" className="diary-access-actions">
+                        <Button onClick={access.resend} loading={access.isSubmitting}>
+                            Отправить письмо ещё раз
+                        </Button>
+                        <Button onClick={access.cancel} disabled={access.isSubmitting}>
+                            Отменить восстановление
+                        </Button>
+                        <Button onClick={() => access.showForm('recovery')} disabled={access.isSubmitting}>
+                            Указать почту заново
+                        </Button>
+                    </Space>
+                </div>
+            )}
+            {access.state.status === 'recovery-confirmation' && (
+                <>
+                    <RecoveryPasswordForm
+                        key={access.state.token}
+                        isSubmitting={access.isSubmitting}
+                        onSubmit={access.resetPassword}
+                        onCancel={access.cancel}
+                    />
+                    <Button onClick={() => access.showForm('recovery')} disabled={access.isSubmitting}>
+                        Запросить новое письмо
+                    </Button>
+                </>
+            )}
+            {access.state.status === 'password-reset' && (
+                <div className="empty-state">
+                    <h2>Пароль установлен</h2>
+                    <p role="status">Дневник и его записи сохранены. Войдите с новым паролем.</p>
+                    <Button type="primary" onClick={() => access.showForm('login')}>
+                        Войти
+                    </Button>
+                </div>
             )}
             {access.state.status === 'sent' && (
                 <div className="empty-state">
