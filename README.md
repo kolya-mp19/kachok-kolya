@@ -72,6 +72,19 @@ HTTP-проверка запускает собранный сервер на п
 
 ## Работа с кодом
 
+Полный воспроизводимый прогон выбранного состояния git:
+
+```powershell
+npm run check
+npm run check -- --ref HEAD
+```
+
+Нужны Git, Node.js/npm указанных выше версий и запущенный Docker с Compose;
+при первом запуске загружаются зависимости, Chromium и образ PostgreSQL.
+Команда проверяет чистую копию `HEAD`, не текущие изменения рабочего каталога.
+Другой commit или tree задаётся через `--ref`. Состав этапов, изоляция БД,
+диагностика и ограничения описаны в [инструкции автопроверки E006](docs/implementation/epics/e006-delivery-foundation/checks.md).
+
 Перед изменениями читать [общие соглашения](docs/architecture/coding-conventions.md),
 затем [руководство бэкенда](docs/architecture/backend-conventions.md) или
 [руководство фронтенда](docs/architecture/frontend-conventions.md).

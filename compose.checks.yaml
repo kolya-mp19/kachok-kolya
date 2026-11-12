@@ -1,0 +1,18 @@
+services:
+  postgres:
+    image: postgres:18.6
+    environment:
+      POSTGRES_USER: checks
+      POSTGRES_PASSWORD: synthetic-checks-only
+      POSTGRES_DB: checks
+    ports:
+      - "127.0.0.1::5432"
+    # Проверочные данные живут только в контейнере этого запуска.
+    tmpfs:
+      - /var/lib/postgresql
+    command: ["postgres", "-c", "log_min_messages=panic", "-c", "log_min_error_statement=panic", "-c", "log_error_verbosity=terse"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U checks -d checks"]
+      interval: 2s
+      timeout: 2s
+      retries: 30

@@ -6,11 +6,8 @@
     "strict": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
-    "noEmit": true
+    "noEmit": true,
+    "allowImportingTsExtensions": true
   },
-  "include": [
-    "vite.config.mts",
-    "prisma.config.ts",
-    "scripts/**/*.mts"
-  ]
+  "include": ["vite.config.mts", "prisma.config.ts", "scripts/**/*.mts"]
 }
