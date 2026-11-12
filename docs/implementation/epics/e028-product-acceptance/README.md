@@ -1,5 +1,9 @@
 # E028. Сквозная приёмка первой версии
 
+## Границы текущего локального этапа
+
+Принимается полноценное локальное приложение: калькулятор, дневник, почтовая регистрация/парольный вход/восстановление через SMTP Mailpit в Docker, реальные сессии и все продуктовые сценарии. Внешняя доставка писем, Яндекс/VK, удалённое развёртывание и выпуск отложены и не входят в локальную приёмку. Они остаются отдельной внешней матрицей E010/E003/E006-T002–T003/E030 и проверяются после реализации и отдельного разрешения. Локальные входы S02 — E004/E005 и E006-T001; завершение E003, полного E006 и E010 не требуется.
+
 Эпик шага **S11** из [общего плана](../../README.md).
 Результат — проверенная совместная работа калькулятора и дневника по действующим требованиям.
 
@@ -15,8 +19,8 @@
 
 ## Зависимости
 
-Нужны обязательные эпики S03–S10: E007–E027 из [реестра](../README.md),
-согласованные мобильные условия и план проверок E002–E003.
+Нужны обязательные эпики S03–S10: E007/E008, локальные E009-T001–T003 и E011–E027 из [реестра](../README.md),
+принятые мобильные условия E002 и матрица E003-T003; внешние части E003 не блокируют локальную приёмку.
 E029 проверяет эксплуатацию, E030 использует результаты обоих эпиков для выпуска.
 
 ## Задачи
@@ -27,9 +31,9 @@ E029 проверяет эксплуатацию, E030 использует ре
 |---|---|---|---|
 | [ ] | [E028-T001. Принять анонимный калькулятор и границу дневника](./tasks/t001-calculator-acceptance.md) | Не начат | [E008](../e008-calculator-experience/prd.md) — полный калькулятор; [E011](../e011-private-diary/prd.md) — сессии; [E007](../e007-calculator-engine/prd.md) — независимые числовые эталоны. |
 | [ ] | [E028-T002. Принять первый дневник и повторное ручное планирование](./tasks/t002-first-diary-acceptance.md) | Не начат | [E009](../e009-email-access/prd.md), [E014](../e014-gyms-and-selection/prd.md), [E017](../e017-plan-management/prd.md), [E019](../e019-workout-recording/prd.md) — регистрация, выбор и создание из ввода, план/разминка/факт; [E020-T001](../e020-workout-history/tasks/t001-workout-and-exercise-history.md) — реальная история у поля веса. |
-| [ ] | [E028-T003. Принять восстановление доступа и сохранность при сбоях](./tasks/t003-access-and-failure-acceptance.md) | Не начат | [E011](../e011-private-diary/prd.md), [E019](../e019-workout-recording/prd.md), [E027-T002](../e027-bodyweight/tasks/t002-manual-bodyweight.md) — все способы входа/сессии и личные потоки записи. |
+| [ ] | [E028-T003. Принять восстановление доступа и сохранность при сбоях](./tasks/t003-access-and-failure-acceptance.md) | Не начат | [E011](../e011-private-diary/prd.md), [E019](../e019-workout-recording/prd.md), [E027-T002](../e027-bodyweight/tasks/t002-manual-bodyweight.md) — почтовый вход, восстановление и сессии и личные потоки записи. |
 | [ ] | [E028-T004. Принять календарь, пересчёты и следующий цикл целиком](./tasks/t004-calendar-and-recalculation-acceptance.md) | Не начат | [E025-T003](../e025-cycle-results/tasks/t003-bodyweight-question.md), [E026-T005](../e026-progress-analytics/tasks/t005-progress-recalculation.md), [E027-T003](../e027-bodyweight/tasks/t003-shared-bodyweight-flow.md) — результаты и динамика; [E020](../e020-workout-history/prd.md) — история и исправления. |
-| [ ] | [E028-T005. Закрыть пробелы и подтвердить приёмку конкретной сборки](./tasks/t005-release-build-acceptance.md) | Не начат | [E028-T001](tasks/t001-calculator-acceptance.md), [E028-T002](tasks/t002-first-diary-acceptance.md), [E028-T003](tasks/t003-access-and-failure-acceptance.md), [E028-T004](tasks/t004-calendar-and-recalculation-acceptance.md); все обязательные функциональные эпики [S03–S10](../README.md). |
+| [ ] | [E028-T005. Закрыть пробелы и подтвердить приёмку конкретной сборки](./tasks/t005-release-build-acceptance.md) | Не начат | [E028-T001](tasks/t001-calculator-acceptance.md), [E028-T002](tasks/t002-first-diary-acceptance.md), [E028-T003](tasks/t003-access-and-failure-acceptance.md), [E028-T004](tasks/t004-calendar-and-recalculation-acceptance.md); все обязательные локальные функциональные эпики [S03–S10](../README.md), без E010 и E009-T004. |
 
 ## Связанные документы
 
