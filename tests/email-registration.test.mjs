@@ -296,6 +296,7 @@ test('регистрация по настоящему SMTP создаёт дн�
           const page = await browser.newPage({ viewport: { width: 320, height: 568 } });
           try {
             await page.goto(origin + '/diary');
+            await page.getByRole('button', { name: 'Создать дневник', exact: true }).click();
             await page.getByLabel('Имя', { exact: true }).fill('Коля');
             const email = uniqueEmail();
             await page.getByLabel('Почта', { exact: true }).fill(email);
@@ -359,13 +360,13 @@ test(
       });
       rejectingSmtp.listen(0, '127.0.0.1');
       await once(rejectingSmtp, 'listening');
-      const origin = 'http://127.0.0.1:3023';
+      const origin = 'http://127.0.0.1:3040';
       let server;
       try {
         for (const port of [rejectingSmtp.address().port, 1]) {
           server = await startLocalServer({
             arguments_: ['dist/api/main.js'],
-            port: 3023,
+            port: 3040,
             healthPath: '/api/health',
             env: { DATABASE_URL: databaseUrl, APP_ORIGIN: origin, SMTP_PORT: String(port) },
           });
@@ -384,7 +385,7 @@ test(
         }
         server = await startLocalServer({
           arguments_: ['dist/api/main.js'],
-          port: 3023,
+          port: 3040,
           healthPath: '/api/health',
           env: { DATABASE_URL: databaseUrl, APP_ORIGIN: origin, SMTP_PORT: smtpPort },
         });

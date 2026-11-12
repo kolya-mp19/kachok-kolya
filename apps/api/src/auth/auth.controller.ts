@@ -3,7 +3,8 @@ import type { CookieOptions, Request, Response } from 'express';
 import type { AuthAttemptResponse, RegistrationResponse, SessionResponse } from '../../../../contracts/email-access.js';
 import { AUTH_CONFIG, type AuthConfig } from './auth.config.js';
 import { AuthProtectionService } from './auth-protection.service.js';
-import { parseConfirmation, parsePendingId, parseRegistration } from './auth-parser.js';
+import { parseConfirmation, parsePendingId, parseRegistration, parsePasswordLogin } from './auth-parser.js';
+import { PasswordLoginService } from './password-login.service.js';
 import { RegistrationService } from './registration.service.js';
 import { SessionService } from './session.service.js';
 
@@ -27,6 +28,7 @@ export class AuthController {
     @Inject(AuthProtectionService) private readonly protection: AuthProtectionService,
     @Inject(RegistrationService) private readonly registration: RegistrationService,
     @Inject(SessionService) private readonly sessions: SessionService,
+    @Inject(PasswordLoginService) private readonly passwords: PasswordLoginService,
   ) {}
 
   @Get('attempt')
@@ -103,6 +105,26 @@ export class AuthController {
       csrfToken: request.get('X-CSRF-Token'),
       origin: request.get('Origin'),
     });
+  }
+
+  @Post('login')
+  async login(
+    @Body() body: unknown,
+    @Req() request: Request,
+    @Res({ passthrough: true }) response: Response,
+  ): Promise<SessionResponse> {
+    this.preventCache(response);
+    await this.verify(request);
+    const result = await this.passwords.login({
+      ...parsePasswordLogin(body),
+      ip: this.ip(request),
+      previousSession: readCookie(request, this.config.sessionCookie),
+    });
+    response.cookie(this.config.sessionCookie, result.session.token, {
+      ...this.cookieOptions(),
+      expires: result.session.expiresAt,
+    });
+    return result.identity;
   }
 
   private ip(request: Request): string {

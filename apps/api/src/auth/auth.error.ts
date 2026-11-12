@@ -1,5 +1,6 @@
 export type AuthErrorCode =
   | 'INVALID_INPUT'
+  | 'INVALID_LOGIN'
   | 'ACCESS_REQUIRED'
   | 'CSRF_INVALID'
   | 'EMAIL_UNAVAILABLE'

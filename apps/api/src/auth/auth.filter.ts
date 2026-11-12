@@ -18,6 +18,7 @@ export class AuthFilter implements ExceptionFilter {
     }
     const statuses: Record<string, number> = {
       INVALID_INPUT: 400,
+      INVALID_LOGIN: 401,
       ACCESS_REQUIRED: 401,
       CSRF_INVALID: 403,
       EMAIL_UNAVAILABLE: 409,

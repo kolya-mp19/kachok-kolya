@@ -8,6 +8,8 @@ import { RegistrationMailService } from './registration-mail.service.js';
 import { RegistrationService } from './registration.service.js';
 import { SessionRepository } from './session.repository.js';
 import { SessionService } from './session.service.js';
+import { PasswordLoginService } from './password-login.service.js';
+import { PasswordLoginRepository } from './password-login.repository.js';
 
 @Module({})
 export class AuthModule {
@@ -26,6 +28,8 @@ export class AuthModule {
         RegistrationService,
         SessionRepository,
         SessionService,
+        PasswordLoginService,
+        PasswordLoginRepository,
       ],
     };
   }

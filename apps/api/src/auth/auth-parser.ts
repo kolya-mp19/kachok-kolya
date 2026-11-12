@@ -1,6 +1,17 @@
 import { AuthError } from './auth.error.js';
 
 export type RegistrationInput = { name: string; email: string; normalizedEmail: string; password: string };
+export type PasswordLoginInput = { normalizedEmail: string; password: string };
+
+export function parsePasswordLogin(input: unknown): PasswordLoginInput {
+  const fields = objectInput(input);
+  const email = typeof fields.email === 'string' ? fields.email.trim() : '';
+  const password = typeof fields.password === 'string' ? fields.password : '';
+  if (email.length > 254 || !/^[^\s@<>]+@[^\s@<>]+\.[^\s@<>]+$/.test(email) || !password || password.length > 256) {
+    throw new AuthError('INVALID_LOGIN');
+  }
+  return { normalizedEmail: email.toLowerCase(), password };
+}
 
 function objectInput(input: unknown): Record<string, unknown> {
   if (!input || typeof input !== 'object' || Array.isArray(input)) {

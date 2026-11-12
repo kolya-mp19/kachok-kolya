@@ -29,9 +29,9 @@ test('мобильная оболочка сохраняет навигацию 
             assert.ok((await link.boundingBox()).height >= 44);
           }
           await nav.getByRole('link', { name: 'Дневник', exact: true }).click();
-          await page.getByRole('heading', { name: 'Регистрация по почте' }).waitFor();
+          await page.getByRole('heading', { name: 'Вход по почте' }).waitFor();
           await page.reload();
-          await page.getByRole('heading', { name: 'Регистрация по почте' }).waitFor();
+          await page.getByRole('heading', { name: 'Вход по почте' }).waitFor();
           await page.evaluate(() => {
             document.documentElement.style.fontSize = '200%';
           });
@@ -50,8 +50,8 @@ test('мобильная оболочка сохраняет навигацию 
     });
 
     for (const [path, chunk, heading, other, otherHeading] of [
-      ['/calculator', 'CalculatorPage', 'Рейтинг · Уилкс', 'Дневник', 'Регистрация по почте'],
-      ['/diary', 'DiaryPage', 'Регистрация по почте', 'Калькулятор', 'Рейтинг · Уилкс'],
+      ['/calculator', 'CalculatorPage', 'Рейтинг · Уилкс', 'Дневник', 'Вход по почте'],
+      ['/diary', 'DiaryPage', 'Вход по почте', 'Калькулятор', 'Рейтинг · Уилкс'],
     ]) {
       await t.test(`${path}: ожидание настоящего модуля видно пользователю`, async () => {
         const page = await browser.newPage({ viewport: { width: 320, height: 280 } });

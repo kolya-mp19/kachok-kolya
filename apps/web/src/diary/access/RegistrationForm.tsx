@@ -4,10 +4,11 @@ import type { RegistrationRequest } from '../../../../../contracts/email-access'
 type RegistrationFormProps = {
     isSubmitting: boolean;
     onSubmit: (input: RegistrationRequest) => Promise<void>;
+    onLogin: () => void;
 };
 
 /** Поля остаются при неуспехе; пароль живёт только в памяти формы до подтверждённой отправки. */
-export function RegistrationForm({ isSubmitting, onSubmit }: RegistrationFormProps) {
+export function RegistrationForm({ isSubmitting, onSubmit, onLogin }: RegistrationFormProps) {
     return (
         <Form<RegistrationRequest>
             layout="vertical"
@@ -58,6 +59,11 @@ export function RegistrationForm({ isSubmitting, onSubmit }: RegistrationFormPro
             <Button type="primary" htmlType="submit" loading={isSubmitting} block>
                 Отправить письмо
             </Button>
+            <div className="diary-access-actions">
+                <Button htmlType="button" onClick={onLogin} disabled={isSubmitting} block>
+                    Войти в прежний дневник
+                </Button>
+            </div>
         </Form>
     );
 }

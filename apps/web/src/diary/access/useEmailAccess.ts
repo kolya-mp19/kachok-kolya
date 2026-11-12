@@ -1,16 +1,29 @@
 import { useEffect, useRef, useState } from 'react';
-import type { RegistrationRequest, SessionResponse } from '../../../../../contracts/email-access';
+import type { PasswordLoginRequest, RegistrationRequest, SessionResponse } from '../../../../../contracts/email-access';
 import * as api from './email-access-api';
 
 export type EmailAccessState =
     | { status: 'loading' }
     | { status: 'registration' }
+    | { status: 'login' }
     | { status: 'confirmation'; token: string }
     | { status: 'sent'; pendingId: string }
     | { status: 'diary'; identity: SessionResponse };
 
+type EmailAccessController = {
+    state: EmailAccessState;
+    errorMessage: string;
+    isSubmitting: boolean;
+    register: (input: RegistrationRequest) => Promise<void>;
+    login: (input: PasswordLoginRequest) => Promise<void>;
+    showForm: (status: 'login' | 'registration') => void;
+    resend: () => Promise<void>;
+    confirm: () => Promise<void>;
+    cancel: () => Promise<void>;
+};
+
 /** Проверяет сессию только внутри дневника; никакие секреты не записывает в storage. */
-export function useEmailRegistration(initialToken: string | null) {
+export function useEmailAccess(initialToken: string | null): EmailAccessController {
     const [state, setState] = useState<EmailAccessState>(
         initialToken ? { status: 'confirmation', token: initialToken } : { status: 'loading' },
     );
@@ -29,11 +42,11 @@ export function useEmailRegistration(initialToken: string | null) {
             try {
                 const identity = await api.getSession();
                 if (isActive) {
-                    setState(identity ? { status: 'diary', identity } : { status: 'registration' });
+                    setState(identity ? { status: 'diary', identity } : { status: 'login' });
                 }
             } catch (error: unknown) {
                 if (isActive) {
-                    setState({ status: 'registration' });
+                    setState({ status: 'login' });
                     setErrorMessage(
                         error instanceof api.EmailAccessError ? error.message : 'Не удалось проверить вход.',
                     );
@@ -80,6 +93,20 @@ export function useEmailRegistration(initialToken: string | null) {
             setState({ status: 'sent', pendingId: result.pendingId });
         });
 
+    const login = async (input: PasswordLoginRequest): Promise<void> =>
+        run(async () => {
+            const identity = await api.login(input, await getCsrf());
+            setState({ status: 'diary', identity });
+        });
+
+    const showForm = (status: 'login' | 'registration'): void => {
+        if (hasActiveAction.current) {
+            return;
+        }
+        setErrorMessage('');
+        setState({ status });
+    };
+
     const resend = async (): Promise<void> =>
         run(async () => {
             if (state.status !== 'sent') {
@@ -106,5 +133,5 @@ export function useEmailRegistration(initialToken: string | null) {
             setState({ status: 'registration' });
         });
 
-    return { state, errorMessage, isSubmitting, register, resend, confirm, cancel };
+    return { state, errorMessage, isSubmitting, register, login, showForm, resend, confirm, cancel };
 }

@@ -1,6 +1,7 @@
 import type {
     AuthAttemptResponse,
     RegistrationRequest,
+    PasswordLoginRequest,
     RegistrationResponse,
     SessionResponse,
 } from '../../../../../contracts/email-access';
@@ -8,7 +9,8 @@ import type {
 const messages: Record<string, string> = {
     INVALID_INPUT: 'Проверьте имя и почту. Пароль должен содержать от 12 до 256 символов.',
     CSRF_INVALID: 'Время действия формы истекло. Обновите страницу и повторите действие.',
-    EMAIL_UNAVAILABLE: 'Этот адрес уже зарегистрирован. Используйте вход в прежний дневник или восстановление доступа.',
+    EMAIL_UNAVAILABLE: 'Этот адрес уже зарегистрирован. Войдите в прежний дневник.',
+    INVALID_LOGIN: 'Не удалось войти. Проверьте почту и пароль.',
     CONFIRMATION_INVALID: 'Ссылка недействительна, использована или срок её действия истёк. Запросите новое письмо.',
     DELIVERY_FAILED: 'Не удалось отправить письмо. Дневник не создан. Повторите отправку.',
     RATE_LIMITED: 'Слишком много попыток. Попробуйте позже.',
@@ -82,6 +84,10 @@ export async function getSession(): Promise<SessionResponse | null> {
 
 export async function register(input: RegistrationRequest, csrfToken: string): Promise<RegistrationResponse> {
     return parseSent(await request('registration', { body: input, csrfToken }));
+}
+
+export async function login(input: PasswordLoginRequest, csrfToken: string): Promise<SessionResponse> {
+    return parseIdentity(await request('login', { body: input, csrfToken }));
 }
 
 export async function resendRegistration(pendingId: string, csrfToken: string): Promise<RegistrationResponse> {

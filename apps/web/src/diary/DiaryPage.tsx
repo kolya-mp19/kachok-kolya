@@ -1,7 +1,8 @@
 import { Alert, Button, Space } from 'antd';
 import { useLayoutEffect, useState } from 'react';
 import { RegistrationForm } from './access/RegistrationForm';
-import { useEmailRegistration } from './access/useEmailRegistration';
+import { PasswordLoginForm } from './access/PasswordLoginForm';
+import { useEmailAccess } from './access/useEmailAccess';
 
 function readConfirmationToken(): string | null {
     const fragment = new URLSearchParams(window.location.hash.slice(1));
@@ -25,7 +26,7 @@ export default function DiaryPage() {
         window.addEventListener('hashchange', readLink);
         return () => window.removeEventListener('hashchange', readLink);
     }, []);
-    const access = useEmailRegistration(initialConfirmationToken);
+    const access = useEmailAccess(initialConfirmationToken);
     return (
         <section aria-labelledby="diary-title">
             <h1 id="diary-title">Дневник</h1>
@@ -39,7 +40,18 @@ export default function DiaryPage() {
                 </p>
             )}
             {access.state.status === 'registration' && (
-                <RegistrationForm isSubmitting={access.isSubmitting} onSubmit={access.register} />
+                <RegistrationForm
+                    isSubmitting={access.isSubmitting}
+                    onSubmit={access.register}
+                    onLogin={() => access.showForm('login')}
+                />
+            )}
+            {access.state.status === 'login' && (
+                <PasswordLoginForm
+                    isSubmitting={access.isSubmitting}
+                    onSubmit={access.login}
+                    onRegister={() => access.showForm('registration')}
+                />
             )}
             {access.state.status === 'sent' && (
                 <div className="empty-state">

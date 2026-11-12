@@ -13,6 +13,7 @@ export class SessionService {
 
   /** Создание сессии входит в транзакцию подтверждения: частичный успех не авторизует. */
   async issue(athleteId: string, previousToken: string | undefined, tx: Prisma.TransactionClient): Promise<IssuedSession> {
+    const accessRevision = await this.sessions.findAccessRevision(athleteId, tx);
     const token = newSecret();
     const csrfToken = newSecret();
     const expiresAt = new Date(Date.now() + 90 * 86400000);
@@ -21,6 +22,7 @@ export class SessionService {
         tokenHash: hashSecret(token),
         csrfHash: hashSecret(csrfToken),
         athleteId,
+        accessRevision,
         expiresAt,
         previousHash: previousToken ? hashSecret(previousToken) : undefined,
       },

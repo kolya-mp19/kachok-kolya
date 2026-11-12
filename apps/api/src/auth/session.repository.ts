@@ -4,11 +4,23 @@ import { STORAGE_CLIENT } from '../storage/storage.tokens.js';
 import type { DiaryIdentity } from '../../../../contracts/email-access.js';
 
 export type StoredSession = AuthSession & { identity: DiaryIdentity; athleteAccessRevision: number };
-type NewAuthSession = { tokenHash: string; csrfHash: string; athleteId: string; expiresAt: Date; previousHash?: string };
+type NewAuthSession = {
+  tokenHash: string;
+  csrfHash: string;
+  athleteId: string;
+  accessRevision: number;
+  expiresAt: Date;
+  previousHash?: string;
+};
 
 @Injectable()
 export class SessionRepository {
   constructor(@Inject(STORAGE_CLIENT) private readonly storage: PrismaClient) {}
+
+  async findAccessRevision(athleteId: string, tx: Prisma.TransactionClient): Promise<number> {
+    const athlete = await tx.athlete.findUniqueOrThrow({ where: { id: athleteId }, select: { accessRevision: true } });
+    return athlete.accessRevision;
+  }
 
   async create(input: NewAuthSession, tx: Prisma.TransactionClient): Promise<void> {
     if (input.previousHash) {
@@ -22,7 +34,7 @@ export class SessionRepository {
         tokenHash: input.tokenHash,
         csrfHash: input.csrfHash,
         athleteId: input.athleteId,
-        accessRevision: 1,
+        accessRevision: input.accessRevision,
         expiresAt: input.expiresAt,
       },
     });
