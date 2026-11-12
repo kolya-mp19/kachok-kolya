@@ -111,6 +111,22 @@
     .calculator-page {
         container: calculator / inline-size;
     }
+    .calculator-formula-choice {
+        display: flex;
+        align-items: center;
+        min-height: 44px;
+        margin-inline-end: 0;
+        font-size: 1rem;
+        line-height: 1.5;
+    }
+    .calculator-precision-action {
+        height: auto;
+        min-height: 44px;
+        padding: 0.5rem;
+        font-size: 1rem;
+        line-height: 1.5;
+        white-space: normal;
+    }
     .calculator-card,
     .calculator-ranking-row {
         min-width: 0;

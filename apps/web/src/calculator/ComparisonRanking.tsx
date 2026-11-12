@@ -1,18 +1,35 @@
-import type { ComparisonRow } from './engine/comparison.type';
+import { useState } from 'react';
+import { Button } from 'antd';
+import type { ComparisonFormula, ComparisonRow } from './engine/comparison.type';
 import { formatValue } from './format-value';
+import { formulaLabels } from './formula-labels';
 import { participantName } from './participant-draft';
 
 type ComparisonRankingProps = {
     rows: ComparisonRow[];
     namesById: Record<string, string>;
+    formula: ComparisonFormula;
 };
 
 const sexLabels = { male: 'Мужской', female: 'Женский' };
 
-export function ComparisonRanking({ rows, namesById }: ComparisonRankingProps) {
+export function ComparisonRanking({ rows, namesById, formula }: ComparisonRankingProps) {
+    const [isPrecisionVisible, setIsPrecisionVisible] = useState(false);
+
     return (
         <section aria-labelledby="ranking-title" className="flex flex-col gap-3">
-            <h2 id="ranking-title">Рейтинг · Уилкс</h2>
+            <h2 id="ranking-title">Рейтинг · {formulaLabels[formula]}</h2>
+            <Button
+                className="calculator-precision-action"
+                aria-expanded={isPrecisionVisible}
+                aria-controls="ranking-precision-note"
+                onClick={() => setIsPrecisionVisible((visible) => !visible)}
+            >
+                {isPrecisionVisible ? 'Скрыть точность' : 'Показать точнее'}
+            </Button>
+            <p id="ranking-precision-note" hidden={!isPrecisionVisible} className="calculator-note">
+                Короткие подписи округлены. Места определены до округления.
+            </p>
             <ol className="m-0 flex list-none flex-col gap-3 p-0">
                 {rows.map((row) => (
                     <li key={row.id} className={`calculator-ranking-row${row.isLeader ? ' calculator-leader' : ''}`}>
@@ -52,6 +69,12 @@ export function ComparisonRanking({ rows, namesById }: ComparisonRankingProps) {
                                 </dd>
                             </div>
                         </dl>
+                        {isPrecisionVisible && row.score !== null && (
+                            <p className="mt-3">
+                                {/* toString сохраняет различия number, включая очень малые итоги: фиксированная точность может их скрыть. */}
+                                Итог до округления: {row.score.toString().replace('.', ',')}
+                            </p>
+                        )}
                     </li>
                 ))}
             </ol>

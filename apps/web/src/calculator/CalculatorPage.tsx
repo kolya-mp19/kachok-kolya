@@ -1,15 +1,18 @@
 import { useEffect, useRef, useState } from 'react';
 import { Button } from 'antd';
 import { calculateComparison } from './engine/calculate-comparison';
+import type { ComparisonFormula } from './engine/comparison.type';
+import { FormulaSelector } from './FormulaSelector';
 import { ParticipantCard } from './ParticipantCard';
 import { ComparisonRanking } from './ComparisonRanking';
 import { createParticipant, type ParticipantChanges, type ParticipantDraft } from './participant-draft';
 
 export default function CalculatorPage() {
     const [participants, setParticipants] = useState<ParticipantDraft[]>(() => [createParticipant(1)]);
+    const [formula, setFormula] = useState<ComparisonFormula>('wilks');
     const nextNumber = useRef(2);
     const pendingFocus = useRef<string | null>(null);
-    const rows = calculateComparison({ formula: 'wilks', participants });
+    const rows = calculateComparison({ formula, participants });
     // Карточки сохраняют порядок ввода; рассчитанные строки соединяются по ID, а не по месту.
     const rowsById = Object.fromEntries(rows.map((row) => [row.id, row]));
     const namesById = Object.fromEntries(participants.map((participant) => [participant.id, participant.name]));
@@ -51,9 +54,7 @@ export default function CalculatorPage() {
                 <h1 id="calculator-title">Калькулятор</h1>
                 <p className="context-description">Строгий подъём на бицепс</p>
             </div>
-            <p>
-                Формула: <strong>Уилкс</strong>
-            </p>
+            <FormulaSelector formula={formula} onChange={setFormula} />
             <div className="flex flex-col gap-4">
                 {participants.map((participant) => (
                     <ParticipantCard
@@ -69,7 +70,7 @@ export default function CalculatorPage() {
             <Button type="primary" onClick={handleAdd} block>
                 Добавить спортсмена
             </Button>
-            <ComparisonRanking rows={rows} namesById={namesById} />
+            <ComparisonRanking rows={rows} namesById={namesById} formula={formula} />
         </section>
     );
 }
