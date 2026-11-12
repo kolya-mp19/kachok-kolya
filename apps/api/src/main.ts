@@ -3,6 +3,7 @@ import { NestFactory } from '@nestjs/core';
 import { resolve } from 'node:path';
 import { AppModule } from './app.module.js';
 import { configureWeb } from './web/configure-web.js';
+import { AuthFilter } from './auth/auth.filter.js';
 
 async function bootstrap(): Promise<void> {
   const port = Number(process.env.PORT ?? 3000);
@@ -12,6 +13,7 @@ async function bootstrap(): Promise<void> {
 
   const app = await NestFactory.create(AppModule);
   app.setGlobalPrefix('api');
+  app.useGlobalFilters(new AuthFilter());
   app.enableShutdownHooks();
   configureWeb(app, resolve(process.cwd(), 'dist/web'));
   await app.listen(port, '127.0.0.1');

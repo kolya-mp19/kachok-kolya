@@ -85,6 +85,26 @@
     .empty-state p {
         margin-top: 0.75rem;
     }
+    .diary-access-form {
+        margin-top: 1.5rem;
+    }
+    .diary-access-form > p {
+        margin: 0.75rem 0 1.5rem;
+        color: #556270;
+    }
+    .diary-access-error {
+        margin-top: 1rem;
+    }
+    .diary-access-actions {
+        margin-top: 1rem;
+        width: 100%;
+    }
+    .diary-access-actions button {
+        min-height: 44px;
+        height: auto;
+        max-width: 100%;
+        white-space: normal;
+    }
     .recovery-action {
         margin-top: 1rem;
         min-height: 44px;

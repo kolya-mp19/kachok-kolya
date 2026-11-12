@@ -23,6 +23,7 @@ test('чистая схема, повтор миграции и новый пр�
       '202611110001_storage_foundation',
       '202611110002_draft_keys',
       '202611110003_operation_receipts',
+      '202611120001_email_registration',
     ]);
     assert.equal(runStorageCli('migrate', url).status, 0);
     assert.deepEqual(runStorageCli('status', url), first);

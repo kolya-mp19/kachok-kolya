@@ -7,11 +7,11 @@ class LocalServer {
   #output = '';
   #process;
 
-  constructor({ arguments_, port, cwd }) {
+  constructor({ arguments_, port, cwd, env }) {
     this.origin = `http://127.0.0.1:${port}`;
     this.#process = spawn(process.execPath, arguments_, {
       cwd,
-      env: { ...process.env, PORT: String(port) },
+      env: { ...process.env, ...env, PORT: String(port) },
       stdio: 'pipe',
     });
     this.#process.stdout.on('data', (chunk) => {
@@ -51,8 +51,8 @@ class LocalServer {
 }
 
 /** Каждый тест владеет своим процессом; отказ запуска также обязан освободить порт. */
-export async function startLocalServer({ arguments_, port, cwd, healthPath = '/' }) {
-  const server = new LocalServer({ arguments_, port, cwd });
+export async function startLocalServer({ arguments_, port, cwd, env, healthPath = '/' }) {
+  const server = new LocalServer({ arguments_, port, cwd, env });
 
   try {
     await server.waitUntilReady(healthPath);

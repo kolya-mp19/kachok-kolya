@@ -222,7 +222,7 @@ class LocalCheck {
     this.env.COMPOSE_PROJECT_NAME = this.project;
     // Запуск может создать контейнер до отказа ожидания; cleanup обязателен с этого момента.
     this.hasDatabase = true;
-    await command('docker', ['compose', 'up', '-d', '--wait', '--wait-timeout', '90', 'postgres'], this.options());
+    await command('docker', ['compose', 'up', '-d', '--wait', '--wait-timeout', '90', 'postgres', 'mailpit'], this.options());
     const binding = await command('docker', ['compose', 'port', 'postgres', '5432'], this.options(true));
     const match = /^127\.0\.0\.1:(\d+)$/u.exec(binding);
     if (!match) {
@@ -230,6 +230,15 @@ class LocalCheck {
     }
     this.env.TEST_DATABASE_URL = `postgresql://checks:synthetic-checks-only@127.0.0.1:${match[1]}/checks`;
     this.env.DATABASE_URL = this.env.TEST_DATABASE_URL;
+    const smtpBinding = await command('docker', ['compose', 'port', 'mailpit', '1025'], this.options(true));
+    const webBinding = await command('docker', ['compose', 'port', 'mailpit', '8025'], this.options(true));
+    const smtpMatch = /^127\.0\.0\.1:(\d+)$/u.exec(smtpBinding);
+    const webMatch = /^127\.0\.0\.1:(\d+)$/u.exec(webBinding);
+    if (!smtpMatch || !webMatch) {
+      throw new Error('CHECK_MAILPIT_PORT_INVALID');
+    }
+    this.env.TEST_SMTP_PORT = smtpMatch[1];
+    this.env.TEST_MAILPIT_URL = `http://127.0.0.1:${webMatch[1]}`;
   }
 
   private async cleanup(): Promise<void> {
