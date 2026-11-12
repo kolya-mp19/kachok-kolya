@@ -1,14 +1,22 @@
-import type { ComparisonInput, ComparisonParticipant, ComparisonRow, NumericInput } from './comparison.type';
+import type {
+    ComparisonFormula,
+    ComparisonInput,
+    ComparisonParticipant,
+    ComparisonRow,
+    NumericInput,
+} from './comparison.type';
+import { calculateIpfGlCoefficient } from './ipf-gl';
 import { calculateWilksCoefficient } from './wilks';
 
 /**
- * Чистый пересчёт по оригинальному Уилксу (формула по умолчанию).
+ * Чистый пересчёт по общей формуле сессии; по умолчанию — оригинальный Уилкс.
  * Возвращает все карточки в порядке рейтинга, не изменяя вход; равенство — строгое, до округления.
  * Вызывающий код передаёт уникальные id и конечные уникальные additionOrder.
  * Неполный или неконечный расчёт не получает места; лучшая попытка сохраняется независимо.
  */
 export function calculateComparison(input: ComparisonInput): ComparisonRow[] {
-    const rows = input.participants.map(calculateParticipant);
+    const formula = input.formula ?? 'wilks';
+    const rows = input.participants.map((participant) => calculateParticipant(participant, formula));
     rows.sort(compareRows);
 
     let previousScore: number | null = null;
@@ -28,7 +36,7 @@ export function calculateComparison(input: ComparisonInput): ComparisonRow[] {
     return rows;
 }
 
-function calculateParticipant(participant: ComparisonParticipant): ComparisonRow {
+function calculateParticipant(participant: ComparisonParticipant, formula: ComparisonFormula): ComparisonRow {
     const bodyWeight = parsePositiveNumber(participant.bodyWeight);
     const attempts = participant.attempts.map(parsePositiveNumber).filter((attempt) => attempt !== null);
     const bestAttempt = attempts.length > 0 ? Math.max(...attempts) : null;
@@ -47,7 +55,10 @@ function calculateParticipant(participant: ComparisonParticipant): ComparisonRow
         return row;
     }
 
-    const coefficient = calculateWilksCoefficient(participant.sex, bodyWeight);
+    const coefficient =
+        formula === 'ipf-gl'
+            ? calculateIpfGlCoefficient(participant.sex, bodyWeight)
+            : calculateWilksCoefficient(participant.sex, bodyWeight);
     const score = bestAttempt * coefficient;
     // R8.1: отказ любой вычисленной величины скрывает обе, но не лучшую попытку.
     if (!Number.isFinite(coefficient) || !Number.isFinite(score)) {

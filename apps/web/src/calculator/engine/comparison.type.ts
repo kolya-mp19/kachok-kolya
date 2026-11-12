@@ -1,4 +1,5 @@
 export type ParticipantSex = 'male' | 'female';
+export type ComparisonFormula = 'wilks' | 'ipf-gl';
 export type NumericInput = string | number | null | undefined;
 export type Attempts = readonly [NumericInput?, NumericInput?, NumericInput?];
 
@@ -12,7 +13,7 @@ export type ComparisonParticipant = {
 };
 
 export type ComparisonInput = {
-    readonly formula?: 'wilks';
+    readonly formula?: ComparisonFormula;
     readonly participants: readonly ComparisonParticipant[];
 };
 
